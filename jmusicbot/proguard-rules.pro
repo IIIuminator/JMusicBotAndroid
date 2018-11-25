@@ -21,7 +21,7 @@
 #-renamesourcefileattribute SourceFile
 
 # don't obfuscate data classes
--keep class me.iberger.jsmusicbot.** { *; }
+-keep class me.iberger.jmusicbot.** { *; }
 
 #### RETROFIT ####
 # Retrofit does reflection on generic parameters. InnerClasses is required to use Signature and
