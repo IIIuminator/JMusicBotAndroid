@@ -26,7 +26,7 @@ internal interface MusicBotAPI {
     fun login(@Body loginCredentials: Credentials.Login): Call<String>
 
     @GET(URL_PLAYER)
-    fun attemptLogin(@Header(KEY_AUTHORIZATION) authToken: String): Call<PlayerState>
+    fun testToken(@Header(KEY_AUTHORIZATION) authToken: String): Call<PlayerState>
 
     // Song operations
 

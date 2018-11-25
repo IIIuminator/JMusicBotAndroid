@@ -32,10 +32,21 @@ class MusicBot(
     user: User,
     initToken: String
 ) {
+    var user: User = user
+        set(newUser) {
+            newUser.save(mPreferences)
+            field = newUser
+        }
+
+    var authToken: String = initToken
+        set(newToken) {
+            mPreferences.edit { putString(KEY_AUTHORIZATION, newToken) }
+            field = newToken
+        }
 
     init {
-        user.save(mPreferences)
-        mPreferences.edit { putString(KEY_AUTHORIZATION, initToken) }
+        this.user = user
+        authToken = initToken
     }
 
     private val okHttpClient: OkHttpClient = OkHttpClient.Builder().apply {
@@ -50,20 +61,6 @@ class MusicBot(
         .client(okHttpClient)
         .build()
         .create(MusicBotAPI::class.java)
-
-    // User operations
-
-    var user: User = user
-        set(newUser) {
-            newUser.save(mPreferences)
-            field = newUser
-        }
-
-    var authToken: String = initToken
-        set(newToken) {
-            mPreferences.edit { putString(KEY_AUTHORIZATION, newToken) }
-            field = newToken
-        }
 
     val provider: List<MusicBotPlugin>
         get() = apiClient.getProvider().process()!!
@@ -178,6 +175,11 @@ class MusicBot(
         internal var baseUrl: String? = null
 
         private val mMoshi = Moshi.Builder().build()
+        private val apiClient: MusicBotAPI = Retrofit.Builder()
+            .addConverterFactory(MoshiConverterFactory.create(mMoshi).asLenient())
+            .baseUrl(baseUrl!!)
+            .build()
+            .create(MusicBotAPI::class.java)
 
         @Throws(IllegalArgumentException::class, UsernameTakenException::class)
         fun init(
@@ -186,61 +188,60 @@ class MusicBot(
             Timber.d("Initiating MusicBot")
             val preferences = context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE)
             verifyHostAddress(context, hostAddress)
-            val apiClient = Retrofit.Builder()
-                .addConverterFactory(MoshiConverterFactory.create(mMoshi).asLenient())
-                .baseUrl(baseUrl!!)
-                .build()
-                .create(MusicBotAPI::class.java)
-
-            val authToken: String
             Timber.d("User setup")
-            val user: User = if (hasUser(context).await()) {
-                User.load(preferences, mMoshi)!!
-            } else {
+            if (!hasUser(context)) {
                 User(
                     userName ?: throw IllegalArgumentException("No user saved and no username given"),
                     password = password
-                )
+                ).save(preferences)
             }
-            try {
-                val tmpToken = preferences.getString(KEY_AUTHORIZATION, null)
-                tmpToken?.also {
-                    Timber.d("Trying saved token")
-                    apiClient.attemptLogin(it)
-                    instance = MusicBot(preferences, baseUrl!!, user, it)
-                    return@async instance
-                }
-                throw AuthException(AuthException.Reason.NEEDS_AUTH)
-            } catch (e: AuthException) {
-                authToken = if (user.password.isNullOrBlank()) registerUser(apiClient, user.name)
-                else try {
-                    loginUser(apiClient, user)
-                } catch (e: NotFoundException) {
-                    val tmpToken = registerUser(apiClient, user.name)
-                    instance = MusicBot(preferences, baseUrl!!, user, tmpToken)
-                    instance.changePassword(user.password!!).await()
-                    return@async instance
-                }
+            authorize(context).let {
+                instance = MusicBot(preferences, baseUrl!!, it.first, it.second)
+                return@async instance
             }
-            instance = MusicBot(preferences, baseUrl!!, user, authToken)
-            return@async instance
         }
 
-        fun hasUser(context: Context) =
-            GlobalScope.async { context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE).contains(KEY_USER) }
+        fun hasAuthorization(context: Context) = try {
+            authorize(context)
+            true
+        } catch (e: Exception) {
+            Timber.w(e)
+            false
+        }
 
-        fun hasServer(context: Context): Deferred<Boolean> = GlobalScope.async {
+        private fun authorize(context: Context): Pair<User, String> {
+            val preferences = context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE)
+            if (!hasUser(context)) throw NotFoundException(NotFoundException.Type.USER, "No user saved")
+            preferences.getString(KEY_AUTHORIZATION, null)?.also {
+                try {
+                    apiClient.testToken(it)
+                    return User.load(preferences)!! to it
+                } catch (e: Exception) {
+                    Timber.w(e)
+                    return@also
+                }
+            }
+            User.load(preferences, mMoshi)!!.also { user ->
+                return if (!user.password.isNullOrBlank()) user to loginUser(user)
+                else user to registerUser(user.name)
+            }
+        }
+
+        private fun hasUser(context: Context) =
+            context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE).contains(KEY_USER)
+
+        fun hasServer(context: Context): Boolean {
             verifyHostAddress(context)
-            return@async baseUrl != null
+            return baseUrl != null
         }
 
-        private fun loginUser(apiClient: MusicBotAPI, user: User): String {
+        private fun loginUser(user: User): String {
             Timber.d("Logging in user ${user.name}")
             Timber.d(mMoshi.adapter<Credentials.Login>(Credentials.Login::class.java).toJson(Credentials.Login(user)))
             return apiClient.login(Credentials.Login(user)).process()!!
         }
 
-        private fun registerUser(apiClient: MusicBotAPI, name: String): String {
+        private fun registerUser(name: String): String {
             Timber.d("Registering user $name")
             return apiClient.registerUser(Credentials.Register(name)).process(errorCodes = mapOf(409 to UsernameTakenException()))!!
         }
