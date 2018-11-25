@@ -45,7 +45,7 @@ internal interface MusicBotAPI {
     fun enqueue(@Query(KEY_SONG_ID) songId: String, @Query(KEY_PROVIDER_ID) providerId: String): Call<List<QueueEntry>>
 
     @PUT("$URL_PLAYER/$URL_QUEUE/order")
-    fun moveSong(@Body song: Song, @Query("index") index: Int): Call<List<QueueEntry>>
+    fun moveSong(@Body entry: QueueEntry, @Query("index") index: Int): Call<List<QueueEntry>>
 
     @GET("$URL_PLAYER/$URL_QUEUE")
     fun getQueue(): Call<List<QueueEntry>>

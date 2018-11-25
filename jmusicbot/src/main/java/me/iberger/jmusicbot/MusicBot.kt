@@ -99,8 +99,8 @@ class MusicBot(
     fun dequeue(song: Song): Deferred<Unit> =
         GlobalScope.async { updateQueue(apiClient.dequeue(song.id, song.provider.id).process()) }
 
-    fun moveSong(song: Song, newPosition: Int): Deferred<Unit> =
-        GlobalScope.async { updateQueue(apiClient.moveSong(song, newPosition).process()) }
+    fun moveSong(entry: QueueEntry, newPosition: Int): Deferred<Unit> =
+        GlobalScope.async { updateQueue(apiClient.moveSong(entry, newPosition).process()) }
 
     fun lookupSong(providerId: String, songId: String) =
         GlobalScope.async { apiClient.lookupSong(providerId, songId) }
