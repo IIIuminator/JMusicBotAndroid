@@ -175,11 +175,7 @@ class MusicBot(
         internal var baseUrl: String? = null
 
         private val mMoshi = Moshi.Builder().build()
-        private val apiClient: MusicBotAPI = Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(mMoshi).asLenient())
-            .baseUrl(baseUrl!!)
-            .build()
-            .create(MusicBotAPI::class.java)
+        private lateinit var apiClient: MusicBotAPI
 
         @Throws(IllegalArgumentException::class, UsernameTakenException::class)
         fun init(
@@ -232,7 +228,15 @@ class MusicBot(
 
         fun hasServer(context: Context): Boolean {
             verifyHostAddress(context)
-            return baseUrl != null
+            baseUrl?.also {
+                apiClient = Retrofit.Builder()
+                    .addConverterFactory(MoshiConverterFactory.create(mMoshi).asLenient())
+                    .baseUrl(it)
+                    .build()
+                    .create(MusicBotAPI::class.java)
+                return true
+            }
+            return false
         }
 
         private fun loginUser(user: User): String {
