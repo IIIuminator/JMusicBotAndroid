@@ -21,7 +21,10 @@
 #-renamesourcefileattribute SourceFile
 
 # don't obfuscate data classes
--keep class me.iberger.jmusicbot.** { *; }
+-keep @kotlin.Metadata class me.iberger.jmusicbot.dayta.**
+-keep class me.iberger.jmusicbot.data.** {
+    <fields>;
+}
 
 #### RETROFIT ####
 # Retrofit does reflection on generic parameters. InnerClasses is required to use Signature and
