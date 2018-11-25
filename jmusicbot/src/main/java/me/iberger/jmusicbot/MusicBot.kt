@@ -77,6 +77,9 @@ class MusicBot(
     private val mQueueUpdateListeners: MutableList<QueueUpdateListener> = mutableListOf()
     private val mPlayerUpdateListeners: MutableList<PlayerUpdateListener> = mutableListOf()
 
+    fun deleteUser(): Deferred<Unit?> =
+        GlobalScope.async { apiClient.deleteUser().process() }
+
     @Throws(InvalidParametersException::class, AuthException::class)
     fun changePassword(newPassword: String) = GlobalScope.async {
         authToken = apiClient.changePassword(
@@ -92,12 +95,18 @@ class MusicBot(
         GlobalScope.async { apiClient.searchForSong(providerId, query).process()!! }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
-    fun enqueue(song: Song) =
+    fun enqueue(song: Song): Deferred<Unit> =
         GlobalScope.async { updateQueue(apiClient.enqueue(song.id, song.provider.id).process()) }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
-    fun dequeue(song: Song) =
+    fun dequeue(song: Song): Deferred<Unit> =
         GlobalScope.async { updateQueue(apiClient.dequeue(song.id, song.provider.id).process()) }
+
+    fun moveSong(song: Song, newPosition: Int): Deferred<Unit> =
+        GlobalScope.async { updateQueue(apiClient.moveSong(song, newPosition).process()) }
+
+    fun lookupSong(providerId: String, songId: String) =
+        GlobalScope.async { apiClient.lookupSong(providerId, songId) }
 
     val history: List<QueueEntry>
         get() = apiClient.getHistory().process()!!
@@ -109,12 +118,12 @@ class MusicBot(
     fun deleteSuggestion(suggesterId: String, song: Song): Deferred<Unit?> =
         GlobalScope.async { apiClient.deleteSuggestion(suggesterId, song.id, song.provider.id).process() }
 
-    private fun changePlayerState(action: PlayerAction) =
+    private fun changePlayerState(action: PlayerAction): Deferred<Unit> =
         GlobalScope.async { updatePlayer(apiClient.setPlayerState(PlayerStateChange(action)).process()) }
 
-    fun pause() = GlobalScope.async { apiClient.pause().process()!! }
-    fun play() = GlobalScope.async { apiClient.play().process()!! }
-    fun skip() = GlobalScope.async { apiClient.skip().process()!! }
+    fun pause(): Deferred<Unit> = GlobalScope.async { updatePlayer(apiClient.pause().process()!!) }
+    fun play(): Deferred<Unit> = GlobalScope.async { updatePlayer(apiClient.play().process()!!) }
+    fun skip(): Deferred<Unit> = GlobalScope.async { updatePlayer(apiClient.skip().process()!!) }
 
     fun startQueueUpdates(listener: QueueUpdateListener, period: Long = 500) {
         mQueueUpdateListeners.add(listener)
@@ -168,8 +177,7 @@ class MusicBot(
         lateinit var instance: MusicBot
         internal var baseUrl: String? = null
 
-        private val mMoshi = Moshi.Builder()
-            .build()
+        private val mMoshi = Moshi.Builder().build()
 
         @Throws(IllegalArgumentException::class, UsernameTakenException::class)
         fun init(
