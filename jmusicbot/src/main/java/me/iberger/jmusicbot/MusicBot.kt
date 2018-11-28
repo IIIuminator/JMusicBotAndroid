@@ -51,7 +51,12 @@ class MusicBot(
 
     private val okHttpClient: OkHttpClient = OkHttpClient.Builder().apply {
         addInterceptor { chain ->
-            chain.proceed(chain.request().newBuilder().addHeader(KEY_AUTHORIZATION, authToken).build())
+            chain.proceed(
+                chain.request().newBuilder().addHeader(
+                    KEY_AUTHORIZATION,
+                    authToken
+                ).build()
+            )
         }
     }.authenticator(TokenAuthenticator()).cache(null).build()
 
@@ -113,7 +118,9 @@ class MusicBot(
     }
 
     fun deleteSuggestion(suggesterId: String, song: Song): Deferred<Unit?> =
-        GlobalScope.async { apiClient.deleteSuggestion(suggesterId, song.id, song.provider.id).process() }
+        GlobalScope.async {
+            apiClient.deleteSuggestion(suggesterId, song.id, song.provider.id).process()
+        }
 
     private fun changePlayerState(action: PlayerAction): Deferred<Unit> =
         GlobalScope.async { updatePlayer(apiClient.setPlayerState(PlayerStateChange(action)).process()) }
@@ -179,7 +186,10 @@ class MusicBot(
 
         @Throws(IllegalArgumentException::class, UsernameTakenException::class)
         fun init(
-            context: Context, userName: String? = null, password: String? = null, hostAddress: String? = null
+            context: Context,
+            userName: String? = null,
+            password: String? = null,
+            hostAddress: String? = null
         ): Deferred<MusicBot> = GlobalScope.async {
             Timber.d("Initiating MusicBot")
             val preferences = context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE)
@@ -187,12 +197,14 @@ class MusicBot(
             Timber.d("User setup")
             if (!hasUser(context)) {
                 User(
-                    userName ?: throw IllegalArgumentException("No user saved and no username given"),
+                    userName
+                        ?: throw IllegalArgumentException("No user saved and no username given"),
                     password = password
                 ).save(preferences)
             }
             authorize(context).let {
                 instance = MusicBot(preferences, baseUrl!!, it.first, it.second)
+                if (!it.first.password.isNullOrBlank()) instance.changePassword(it.first.password!!).await()
                 return@async instance
             }
         }
@@ -207,7 +219,10 @@ class MusicBot(
 
         private fun authorize(context: Context): Pair<User, String> {
             val preferences = context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE)
-            if (!hasUser(context)) throw NotFoundException(NotFoundException.Type.USER, "No user saved")
+            if (!hasUser(context)) throw NotFoundException(
+                NotFoundException.Type.USER,
+                "No user saved"
+            )
             preferences.getString(KEY_AUTHORIZATION, null)?.also {
                 try {
                     apiClient.testToken(it)
@@ -217,9 +232,16 @@ class MusicBot(
                     return@also
                 }
             }
-            User.load(preferences, mMoshi)!!.also { user ->
-                return if (!user.password.isNullOrBlank()) user to loginUser(user)
-                else user to registerUser(user.name)
+            User.load(preferences, mMoshi)!!.let { user ->
+                val token = if (!user.password.isNullOrBlank()) try {
+                    loginUser(user)
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    registerUser(user.name)
+                    apiClient.changePassword(Credentials.PasswordChange((user.password!!))).process()!!
+                } else registerUser(user.name)
+                preferences.edit { putString(KEY_AUTHORIZATION, token) }
+                return user to token
             }
         }
 
@@ -241,7 +263,11 @@ class MusicBot(
 
         private fun loginUser(user: User): String {
             Timber.d("Logging in user ${user.name}")
-            Timber.d(mMoshi.adapter<Credentials.Login>(Credentials.Login::class.java).toJson(Credentials.Login(user)))
+            Timber.d(
+                mMoshi.adapter<Credentials.Login>(Credentials.Login::class.java).toJson(
+                    Credentials.Login(user)
+                )
+            )
             return apiClient.login(Credentials.Login(user)).process()!!
         }
 
