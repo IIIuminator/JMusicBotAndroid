@@ -16,6 +16,9 @@ internal interface MusicBotAPI {
     @PUT(URL_USER)
     fun changePassword(@Body newPassword: Credentials.PasswordChange): Call<String>
 
+    @PUT(URL_USER)
+    fun changePasswordWithToken(@Header(KEY_AUTHORIZATION) authToken: String, @Body newPassword: Credentials.PasswordChange): Call<String>
+
     @DELETE(URL_USER)
     fun deleteUser(): Call<Unit>
 

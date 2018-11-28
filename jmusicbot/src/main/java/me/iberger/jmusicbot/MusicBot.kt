@@ -195,7 +195,7 @@ class MusicBot(
             val preferences = context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE)
             verifyHostAddress(context, hostAddress)
             Timber.d("User setup")
-            if (!hasUser(context)) {
+            if (!hasUser(context) || userName != null) {
                 User(
                     userName
                         ?: throw IllegalArgumentException("No user saved and no username given"),
@@ -204,7 +204,6 @@ class MusicBot(
             }
             authorize(context).let {
                 instance = MusicBot(preferences, baseUrl!!, it.first, it.second)
-                if (!it.first.password.isNullOrBlank()) instance.changePassword(it.first.password!!).await()
                 return@async instance
             }
         }
@@ -237,8 +236,10 @@ class MusicBot(
                     loginUser(user)
                 } catch (e: Exception) {
                     Timber.e(e)
-                    registerUser(user.name)
-                    apiClient.changePassword(Credentials.PasswordChange((user.password!!))).process()!!
+                    apiClient.changePasswordWithToken(
+                        registerUser(user.name),
+                        Credentials.PasswordChange((user.password!!))
+                    ).process()!!
                 } else registerUser(user.name)
                 preferences.edit { putString(KEY_AUTHORIZATION, token) }
                 return user to token
