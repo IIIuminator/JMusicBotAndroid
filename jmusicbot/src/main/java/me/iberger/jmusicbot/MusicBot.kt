@@ -2,16 +2,16 @@ package me.iberger.jmusicbot
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.wifi.WifiManager
 import androidx.core.content.edit
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 import me.iberger.jmusicbot.data.*
 import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.InvalidParametersException
 import me.iberger.jmusicbot.exceptions.NotFoundException
 import me.iberger.jmusicbot.exceptions.UsernameTakenException
+import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import me.iberger.jmusicbot.listener.PlayerUpdateListener
 import me.iberger.jmusicbot.listener.QueueUpdateListener
 import me.iberger.jmusicbot.network.MusicBotAPI
@@ -28,10 +28,23 @@ import kotlin.concurrent.fixedRateTimer
 
 class MusicBot(
     private val mPreferences: SharedPreferences,
+    private val mWifiManager: WifiManager,
     baseUrl: String,
     user: User,
     initToken: String
 ) {
+
+    private val okHttpClient: OkHttpClient = OkHttpClient.Builder().apply {
+        addInterceptor { chain ->
+            chain.proceed(
+                chain.request().newBuilder().addHeader(
+                    KEY_AUTHORIZATION,
+                    authToken
+                ).build()
+            )
+        }
+    }.authenticator(TokenAuthenticator()).cache(null).build()
+    private var apiClient: MusicBotAPI
     var user: User = user
         set(newUser) {
             newUser.save(mPreferences)
@@ -47,37 +60,28 @@ class MusicBot(
     init {
         this.user = user
         authToken = initToken
+        apiClient = initApi(baseUrl)
     }
 
-    private val okHttpClient: OkHttpClient = OkHttpClient.Builder().apply {
-        addInterceptor { chain ->
-            chain.proceed(
-                chain.request().newBuilder().addHeader(
-                    KEY_AUTHORIZATION,
-                    authToken
-                ).build()
-            )
-        }
-    }.authenticator(TokenAuthenticator()).cache(null).build()
-
-    private val apiClient: MusicBotAPI = Retrofit.Builder()
+    private fun initApi(url: String) = Retrofit.Builder()
         .addConverterFactory(MoshiConverterFactory.create(mMoshi).asLenient())
-        .baseUrl(baseUrl)
+        .baseUrl(url)
         .client(okHttpClient)
         .build()
         .create(MusicBotAPI::class.java)
 
-    val provider: List<MusicBotPlugin>
-        get() = apiClient.getProvider().process()!!
+    val provider: List<MusicBotPlugin>?
+        get() = apiClient.getProvider().process()
 
-    val suggesters: List<MusicBotPlugin>
-        get() = apiClient.getSuggesters().process()!!
+    val suggesters: List<MusicBotPlugin>?
+        get() = apiClient.getSuggesters().process()
 
     private var mQueueUpdateTimer: Timer? = null
     private var mPlayerUpdateTimer: Timer? = null
 
     private val mQueueUpdateListeners: MutableList<QueueUpdateListener> = mutableListOf()
     private val mPlayerUpdateListeners: MutableList<PlayerUpdateListener> = mutableListOf()
+    val connectionChangeListeners: MutableList<ConnectionChangeListener> = mutableListOf()
 
     fun deleteUser(): Deferred<Unit?> =
         GlobalScope.async { apiClient.deleteUser().process() }
@@ -173,12 +177,29 @@ class MusicBot(
         }
     }
 
+    fun onConnectionLost(e: Exception) {
+        baseUrl = null
+        connectionChangeListeners.forEach { it.onConnectionLost(e) }
+        runBlocking {
+            while (true) {
+                try {
+                    verifyHostAddress(mWifiManager)
+                    if (baseUrl != null) return@runBlocking
+                    delay(500L)
+                } catch (e: Exception) {
+                    Timber.e(e)
+                }
+            }
+        }
+        apiClient = initApi(baseUrl!!)
+        connectionChangeListeners.forEach { it.onConnectionRecovered() }
+    }
 
     // ########## Companion object with init functions ########## //
 
     companion object {
 
-        lateinit var instance: MusicBot
+        var instance: MusicBot? = null
         internal var baseUrl: String? = null
 
         private val mMoshi = Moshi.Builder().build()
@@ -193,7 +214,9 @@ class MusicBot(
         ): Deferred<MusicBot> = GlobalScope.async {
             Timber.d("Initiating MusicBot")
             val preferences = context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE)
-            verifyHostAddress(context, hostAddress)
+            val wifiManager =
+                context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            verifyHostAddress(wifiManager, hostAddress)
             Timber.d("User setup")
             if (!hasUser(context) || userName != null) {
                 User(
@@ -203,8 +226,8 @@ class MusicBot(
                 ).save(preferences)
             }
             authorize(context).let {
-                instance = MusicBot(preferences, baseUrl!!, it.first, it.second)
-                return@async instance
+                instance = MusicBot(preferences, wifiManager, baseUrl!!, it.first, it.second)
+                return@async instance!!
             }
         }
 
@@ -250,7 +273,7 @@ class MusicBot(
             context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE).contains(KEY_USER)
 
         fun hasServer(context: Context): Boolean {
-            verifyHostAddress(context)
+            verifyHostAddress(context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager)
             baseUrl?.also {
                 apiClient = Retrofit.Builder()
                     .addConverterFactory(MoshiConverterFactory.create(mMoshi).asLenient())

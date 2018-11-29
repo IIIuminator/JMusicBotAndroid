@@ -11,8 +11,8 @@ import timber.log.Timber
 class TokenAuthenticator : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
         Timber.d("Retrieving new token NP")
-        val newToken = MusicBot.instance.refreshToken().body()!!
-        MusicBot.instance.authToken = newToken
+        val newToken = MusicBot.instance?.refreshToken()?.body()!!
+        MusicBot.instance?.authToken = newToken
         return response.request().newBuilder().header(KEY_AUTHORIZATION, newToken).build()
     }
 }
