@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/JMusicBotAndroid.iml" filepath="$PROJECT_DIR$/JMusicBotAndroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jmusicbot/jmusicbot.iml" filepath="$PROJECT_DIR$/jmusicbot/jmusicbot.iml" />
     </modules>
   </component>
 </project>

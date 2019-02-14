@@ -1,4 +1,4 @@
-package me.iberger.jmusicbot.data
+package me.iberger.jmusicbot.model
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -17,16 +17,16 @@ sealed class Credentials {
     @JsonClass(generateAdapter = true)
     class Login(
         @Json(name = "name") val name: String,
-        @Json(name = "uuid") val uuid: String = UUID.randomUUID().toString(),
-        @Json(name = "password") val password: String
+        @Json(name = "password") val password: String,
+        @Json(name = "uuid") val uuid: String = UUID.randomUUID().toString()
     ) : Credentials() {
         constructor(user: User) : this(
             user.name,
-            user.uuid,
             user.password ?: throw InvalidParametersException(
                 InvalidParametersException.Type.INVALID_PASSWORD,
                 "Password can't be null"
-            )
+            ),
+            user.uuid
         )
     }
 

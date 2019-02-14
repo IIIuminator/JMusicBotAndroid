@@ -1,16 +1,12 @@
 package me.iberger.jmusicbot.network
 
 import android.net.wifi.WifiManager
-import me.iberger.jmusicbot.MusicBot
-import me.iberger.jmusicbot.exceptions.AuthException
-import me.iberger.jmusicbot.exceptions.InvalidParametersException
-import me.iberger.jmusicbot.exceptions.NotFoundException
-import me.iberger.jmusicbot.exceptions.ServerErrorException
-import retrofit2.Call
+import kotlinx.coroutines.Deferred
+import me.iberger.jmusicbot.JMusicBot
+import me.iberger.jmusicbot.exceptions.*
 import retrofit2.Response
 import timber.log.Timber
 import java.io.IOException
-import java.lang.Exception
 import java.net.DatagramPacket
 import java.net.InetAddress
 import java.net.MulticastSocket
@@ -19,13 +15,8 @@ private const val GROUP_ADDRESS = "224.0.0.142"
 private const val PORT = 42945
 private const val LOCK_TAG = "enq_broadcast"
 
-internal fun verifyHostAddress(wifiManager: WifiManager, address: String? = null) {
-    MusicBot.baseUrl = address ?: MusicBot.baseUrl ?: discoverHost(wifiManager)
-    Timber.d("New host address: ${MusicBot.baseUrl}")
-}
-
-private fun discoverHost(wifiManager: WifiManager): String? {
-    val lock = wifiManager.createMulticastLock(LOCK_TAG)
+internal fun WifiManager.discoverHost(): String? {
+    val lock = createMulticastLock(LOCK_TAG)
     lock.acquire()
     return try {
         MulticastSocket(PORT).use { socket ->
@@ -46,21 +37,23 @@ private fun discoverHost(wifiManager: WifiManager): String? {
     }
 }
 
-internal fun <T> Call<T>.process(
+
+@Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class, ServerErrorException::class)
+internal suspend fun <T> Deferred<Response<T>>.process(
     successCodes: List<Int> = listOf(200, 201, 204),
     errorCodes: Map<Int, Exception> = mapOf(),
     notFoundType: NotFoundException.Type = NotFoundException.Type.SONG,
     invalidParamsType: InvalidParametersException.Type = InvalidParametersException.Type.MISSING
-): T? {
+): T {
     val response: Response<T>
     try {
-        response = execute()
+        response = await()
     } catch (e: Exception) {
-        MusicBot.instance?.onConnectionLost(e)
-        return null
+        JMusicBot.onConnectionLost(e)
+        throw e
     }
     return when (response.code()) {
-        in successCodes -> response.body()
+        in successCodes -> response.body()!!
         in errorCodes -> throw errorCodes[response.code()]!!
         400 -> throw InvalidParametersException(
             invalidParamsType,
@@ -75,8 +68,9 @@ internal fun <T> Call<T>.process(
             response.errorBody()!!.string()
         )
         404 -> throw NotFoundException(notFoundType, response.errorBody()!!.string())
+        409 -> throw UsernameTakenException()
         else -> {
-            Timber.e("Error: ${response.errorBody()!!.string()}")
+            Timber.e("Server Error: ${response.errorBody()!!.string()}, ${response.code()}")
             throw ServerErrorException(response.code())
         }
     }

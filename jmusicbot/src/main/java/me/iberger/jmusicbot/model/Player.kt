@@ -1,4 +1,4 @@
-package me.iberger.jmusicbot.data
+package me.iberger.jmusicbot.model
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -7,7 +7,9 @@ import com.squareup.moshi.JsonClass
 data class PlayerState(
     @Json(name = "state") val state: PlayerStates,
     @Json(name = "songEntry") val songEntry: SongEntry?
-)
+) {
+    constructor(state: PlayerStates) : this(state, null)
+}
 
 @JsonClass(generateAdapter = true)
 data class PlayerStateChange(
