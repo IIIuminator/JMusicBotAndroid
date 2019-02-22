@@ -17,6 +17,8 @@ object Versions {
 
     const val jwtdecode: String = "1.2.0" 
 
+    const val com_github_dcendents_android_maven_gradle_plugin: String = "2.1" 
+
     const val retrofit2_kotlin_coroutines_adapter: String = "0.9.2" 
 
     const val timber: String = "4.7.1" 
@@ -31,7 +33,7 @@ object Versions {
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.3.2" 
 
-    const val sentry_android_gradle_plugin: String = "1.7.21" // available: "1.7.21"
+    const val sentry_android_gradle_plugin: String = "1.7.21" 
 
     const val org_jetbrains_kotlin: String = "1.3.21" 
 

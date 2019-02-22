@@ -11,6 +11,7 @@ buildscript {
 }
 
 plugins {
+    id("com.github.dcendents.android-maven") version Versions.com_github_dcendents_android_maven_gradle_plugin
     id("de.fayard.buildSrcVersions") version Versions.de_fayard_buildsrcversions_gradle_plugin
 }
 
@@ -18,17 +19,10 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven(url = "https://jitpack.io")
     }
 }
 
-tasks {
-    val clean by registering(Delete::class) {
-        delete(buildDir)
-        delete("app/build")
-    }
-    wrapper{
-        distributionType = Wrapper.DistributionType.BIN
-        version = Versions.Gradle.runningVersion
-    }
+tasks.wrapper{
+    distributionType = Wrapper.DistributionType.BIN
+    version = Versions.Gradle.runningVersion
 }

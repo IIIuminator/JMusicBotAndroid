@@ -28,6 +28,10 @@ object Libs {
      * https://github.com/auth0/jwtdecode.android */
     const val jwtdecode: String = "com.auth0.android:jwtdecode:" + Versions.jwtdecode
 
+    const val com_github_dcendents_android_maven_gradle_plugin: String =
+            "com.github.dcendents.android-maven:com.github.dcendents.android-maven.gradle.plugin:" +
+            Versions.com_github_dcendents_android_maven_gradle_plugin
+
     /**
      * https://github.com/JakeWharton/retrofit2-kotlin-coroutines-adapter/ */
     const val retrofit2_kotlin_coroutines_adapter: String =
