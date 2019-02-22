@@ -27,4 +27,8 @@ tasks {
         delete(buildDir)
         delete("app/build")
     }
+    wrapper{
+        distributionType = Wrapper.DistributionType.BIN
+        version = Versions.Gradle.runningVersion
+    }
 }
