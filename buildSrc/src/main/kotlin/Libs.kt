@@ -17,6 +17,10 @@ object Libs {
 
     /**
      * https://developer.android.com/studio */
+    const val aapt2: String = "com.android.tools.build:aapt2:" + Versions.aapt2
+
+    /**
+     * https://developer.android.com/studio */
     const val com_android_tools_build_gradle: String = "com.android.tools.build:gradle:" +
             Versions.com_android_tools_build_gradle
 
@@ -33,6 +37,19 @@ object Libs {
             Versions.com_github_dcendents_android_maven_gradle_plugin
 
     /**
+     * https://github.com/Tinder/StateMachine */
+    const val statemachine: String = "com.github.tinder:statemachine:" + Versions.statemachine
+
+    /**
+     * https://github.com/google/dagger */
+    const val dagger_compiler: String = "com.google.dagger:dagger-compiler:" +
+            Versions.com_google_dagger
+
+    /**
+     * https://github.com/google/dagger */
+    const val dagger: String = "com.google.dagger:dagger:" + Versions.com_google_dagger
+
+    /**
      * https://github.com/JakeWharton/retrofit2-kotlin-coroutines-adapter/ */
     const val retrofit2_kotlin_coroutines_adapter: String =
             "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:" +
@@ -42,15 +59,9 @@ object Libs {
      * https://github.com/JakeWharton/timber */
     const val timber: String = "com.jakewharton.timber:timber:" + Versions.timber
 
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_preferences: String = "com.louiscad.splitties:splitties-preferences:" +
-            Versions.com_louiscad_splitties
-
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_systemservices: String =
-            "com.louiscad.splitties:splitties-systemservices:" + Versions.com_louiscad_splitties
+    const val splitties_fun_pack_android_base: String =
+            "com.louiscad.splitties:splitties-fun-pack-android-base:" +
+            Versions.splitties_fun_pack_android_base
 
     /**
      * https://github.com/square/moshi */
@@ -63,7 +74,12 @@ object Libs {
 
     /**
      * https://github.com/square/okhttp */
-    const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.okhttp
+    const val logging_interceptor: String = "com.squareup.okhttp3:logging-interceptor:" +
+            Versions.com_squareup_okhttp3
+
+    /**
+     * https://github.com/square/okhttp */
+    const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.com_squareup_okhttp3
 
     /**
      * https://github.com/square/retrofit/ */
@@ -80,9 +96,14 @@ object Libs {
             Versions.de_fayard_buildsrcversions_gradle_plugin
 
     /**
-     * https://github.com/getsentry/sentry-java */
-    const val sentry_android_gradle_plugin: String = "io.sentry:sentry-android-gradle-plugin:" +
-            Versions.sentry_android_gradle_plugin
+     * http://assertj.org */
+    const val assertj_core: String = "org.assertj:assertj-core:" + Versions.assertj_core
+
+    /**
+     * https://kotlinlang.org/ */
+    const val kotlin_android_extensions_runtime: String =
+            "org.jetbrains.kotlin:kotlin-android-extensions-runtime:" +
+            Versions.org_jetbrains_kotlin
 
     /**
      * https://kotlinlang.org/ */

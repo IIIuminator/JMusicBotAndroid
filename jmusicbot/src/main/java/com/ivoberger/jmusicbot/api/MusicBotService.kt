@@ -6,24 +6,26 @@ import kotlinx.coroutines.Deferred
 import retrofit2.Response
 import retrofit2.http.*
 
-private const val URL_USER = "user"
-private const val URL_PLAYER = "player"
-private const val URL_SUGGEST = "suggester"
-private const val URL_PROVIDER = "provider"
-private const val URL_QUEUE = "queue"
+internal interface MusicBotService {
+    companion object {
+        private const val URL_USER = "user"
+        private const val URL_PLAYER = "player"
+        private const val URL_SUGGEST = "suggester"
+        private const val URL_PROVIDER = "provider"
+        private const val URL_QUEUE = "queue"
+    }
 
-internal interface MusicBotAPI {
     // User operations
     @PUT(URL_USER)
-    fun changePassword(@Body newPassword: AuthTypes.PasswordChange): Deferred<Response<String>>
+    fun changePassword(@Body newPassword: Auth.PasswordChange): Deferred<Response<String>>
 
     @DELETE(URL_USER)
     fun deleteUser(): Deferred<Response<Unit>>
 
     @POST(URL_USER)
-    fun registerUser(@Body credentials: AuthTypes.Register): Deferred<Response<String>>
+    fun registerUser(@Body credentials: Auth.Register): Deferred<Response<String>>
 
-    @GET("jwt")
+    @GET("token")
     fun loginUser(@Header(KEY_AUTHORIZATION) loginCredentials: String): Deferred<Response<String>>
 
     @GET(URL_USER)
@@ -48,7 +50,11 @@ internal interface MusicBotAPI {
     fun enqueue(@Query(KEY_SONG_ID) songId: String, @Query(KEY_PROVIDER_ID) providerId: String): Deferred<Response<List<QueueEntry>>>
 
     @PUT("$URL_PLAYER/$URL_QUEUE/order")
-    fun moveEntry(@Body entry: QueueEntry, @Query("index") index: Int): Deferred<Response<List<QueueEntry>>>
+    fun moveEntry(
+        @Body entry: QueueEntry, @Query("providerId") providerId: String, @Query("songId") songId: String, @Query(
+            "index"
+        ) index: Int
+    ): Deferred<Response<List<QueueEntry>>>
 
     @GET("$URL_PLAYER/$URL_QUEUE")
     fun getQueue(): Deferred<Response<List<QueueEntry>>>
@@ -81,8 +87,8 @@ internal interface MusicBotAPI {
     @GET(URL_PLAYER)
     fun getPlayerState(): Deferred<Response<PlayerState>>
 
-    @PUT(URL_PLAYER)
-    fun setPlayerState(@Body playerStateChange: PlayerStateChange): Deferred<Response<PlayerState>>
+//    @PUT(URL_PLAYER)
+//    fun setPlayerState(@Body playerStateChange: PlayerStateChange): Deferred<Response<PlayerState>>
 
     @PUT(URL_PLAYER)
     fun pause(@Body playerStateChange: PlayerStateChange = PlayerStateChange(PlayerAction.PAUSE)): Deferred<Response<PlayerState>>
