@@ -6,11 +6,11 @@ buildscript {
     dependencies {
         classpath(Libs.com_android_tools_build_gradle)
         classpath(Libs.kotlin_gradle_plugin)
+        classpath(Libs.com_github_dcendents_android_maven_gradle_plugin)
     }
 }
 
 plugins {
-    id("com.github.dcendents.android-maven") version Versions.com_github_dcendents_android_maven_gradle_plugin
     id("de.fayard.buildSrcVersions") version Versions.de_fayard_buildsrcversions_gradle_plugin
 }
 

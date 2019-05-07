@@ -1,6 +1,6 @@
 # Add project specific ProGuard rules here.
 # You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.kts.kts.
+# proguardFiles setting in build.gradle.kts.
 #
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
@@ -21,8 +21,8 @@
 #-renamesourcefileattribute SourceFile
 
 # don't obfuscate data classes
--keep @kotlin.Metadata class me.iberger.jmusicbot.dayta.**
--keep class me.iberger.jmusicbot.data.** {
+-keep @kotlin.Metadata class com.ivoberger.jmusicbot.model.**
+-keep class com.ivoberger.jmusicbot.model.** {
     <fields>;
 }
 
@@ -59,8 +59,9 @@
 # OkHttp platform used only on JVM and when Conscrypt dependency is available.
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
 
-#### MOSHI ####
 
+
+#### MOSHI ####
 
 # JSR 305 annotations are for embedding nullability information.
 -dontwarn javax.annotation.**
@@ -77,17 +78,15 @@
     <fields>;
 }
 
-# The name of @JsonClass types is used to look up the generated adapter.
--keepnames @com.squareup.moshi.JsonClass class *
-
-# Retain generated JsonAdapters if annotated type is retained.
--if @com.squareup.moshi.JsonClass class *
--keep class <1>JsonAdapter {
-    <init>(...);
-    <fields>;
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public class * extends com.bumptech.glide.module.AppGlideModule
+-keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
+  **[] $VALUES;
+  public *;
 }
--if @com.squareup.moshi.JsonClass class **$*
--keep class <1>_<2>JsonAdapter {
-    <init>(...);
+-dontwarn com.bumptech.glide.load.resource.bitmap.VideoDecoder
+
+-keep @kotlin.Metadata class com.ivoberger.jmusicbot.model.**
+-keep class com.ivoberger.jmusicbot.model.** {
     <fields>;
 }

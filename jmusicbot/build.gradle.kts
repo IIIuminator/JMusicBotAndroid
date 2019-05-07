@@ -3,7 +3,10 @@ plugins {
     kotlin("android")
     kotlin("android.extensions")
     kotlin("kapt")
+    id("com.github.dcendents.android-maven")
 }
+
+group = "com.ivoberger"
 
 android {
     compileSdkVersion(28)
@@ -17,7 +20,7 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            consumerProguardFile("consumer-proguard-rules.pro")
         }
     }
     packagingOptions.pickFirst("META-INF/atomicfu.kotlin_module")
