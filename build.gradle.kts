@@ -11,21 +11,18 @@ buildscript {
 }
 
 plugins {
-    id("de.fayard.buildSrcVersions") version(Versions.de_fayard_buildsrcversions_gradle_plugin)
-    id("com.diffplug.gradle.spotless") version(Versions.com_diffplug_gradle_spotless_gradle_plugin)
+    id("de.fayard.buildSrcVersions") version (Versions.de_fayard_buildsrcversions_gradle_plugin)
+    id("com.diffplug.gradle.spotless") version (Versions.com_diffplug_gradle_spotless_gradle_plugin)
 }
 
 allprojects {
+    version = "0.8.0"
     repositories {
         google()
         jcenter()
         maven(url = "https://jitpack.io")
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
     }
-}
-
-subprojects {
-    version = "0.8.0"
 }
 
 spotless {
@@ -56,7 +53,7 @@ spotless {
     }
 }
 
-tasks.wrapper{
+tasks.wrapper {
     distributionType = Wrapper.DistributionType.BIN
     version = Versions.Gradle.runningVersion
 }
