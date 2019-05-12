@@ -25,6 +25,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import timber.log.verbose
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -40,7 +41,7 @@ internal class BaseModule(private val logLevel: HttpLoggingInterceptor.Level = H
         HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { msg ->
             Timber.tagged("BotSDKNetworking").verbose { msg }
         }).setLevel(logLevel)
-    )
+    ).retryOnConnectionFailure(true).connectTimeout(30, TimeUnit.SECONDS)
 
     @Provides
     @Named(NameKeys.BUILDER_RETROFIT_BASE)

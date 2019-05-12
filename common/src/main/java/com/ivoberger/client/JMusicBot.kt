@@ -29,7 +29,6 @@ import com.ivoberger.client.model.*
 import com.tinder.StateMachine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -145,37 +144,25 @@ object JMusicBot {
         if (!state.isConnected) authorize(authUser)
     }
 
-    suspend fun setHost(hostAddress: String) = withContext(Dispatchers.IO) {
-        if (state.isDiscovering || state.running != null) return@withContext
-        Timber.debug { "Setting host" }
-        if (!state.isDisconnected) stateMachine.transition(Event.Disconnect())
-        stateMachine.transition(Event.StartDiscovery)
-        stateMachine.transition(Event.ServerFound(hostAddress))
-    }
-
     suspend fun discoverHost(knownHost: String? = null) = withContext(Dispatchers.IO) {
         if (state.isDiscovering || state.running != null) return@withContext
         Timber.debug { "Discovering host" }
         if (!state.isDisconnected) stateMachine.transition(Event.Disconnect())
         stateMachine.transition(Event.StartDiscovery)
-        state.running = launch {
-            val hostAddress = knownHost ?: listenForServerMulticast()
-            hostAddress?.let {
-                baseUrl = knownHost ?: "http://$it:$PORT/"
-                Timber.debug { "Found host: $baseUrl" }
-                stateMachine.transition(Event.ServerFound(baseUrl!!))
-                return@launch
-            }
-            Timber.debug { "No host found" }
-            stateMachine.transition(Event.Disconnect())
+        val hostAddress = knownHost ?: listenForServerMulticast()
+        hostAddress?.let {
+            baseUrl = knownHost ?: "http://$it:$PORT/"
+            Timber.debug { "Found host: $baseUrl" }
+            stateMachine.transition(Event.ServerFound(baseUrl!!))
+            return@withContext
         }
-        state.running?.join()
+        Timber.debug { "No host found" }
+        stateMachine.transition(Event.Disconnect())
     }
 
     suspend fun recoverConnection() = withContext(Dispatchers.IO) {
         Timber.debug { "Reconnecting" }
         while (!state.hasServer) {
-            state.running?.join()
             discoverHost()
         }
         authorize()

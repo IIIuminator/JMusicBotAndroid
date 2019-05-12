@@ -15,7 +15,8 @@
 */
 package com.ivoberger.client.android
 
-import android.net.wifi.WifiManager
+import com.ivoberger.client.JMusicBot
+import splitties.systemservices.wifiManager
 import timber.log.Timber
 import timber.log.debug
 import java.io.IOException
@@ -28,9 +29,9 @@ internal const val PORT = 42945
 private const val LOCK_TAG = "enq_broadcast"
 private const val SOCKET_TIMEOUT = 4000
 
-internal fun WifiManager.listenForServerMulticast(): String? {
-    val lock = createMulticastLock(LOCK_TAG)
-    if (lock.isHeld) return null
+internal fun JMusicBot.listenForServerMulticast(): String? {
+    val lock = wifiManager?.createMulticastLock(LOCK_TAG)
+    if (lock?.isHeld != false) return null
     lock.acquire()
     Timber.debug { "Multicast lock acquired" }
     return try {
