@@ -1,1 +1,1 @@
-include ':jmusicbot'
+include ':common', ':android'
