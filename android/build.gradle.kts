@@ -6,8 +6,6 @@ plugins {
     id("com.github.dcendents.android-maven")
 }
 
-group = "com.ivoberger.jmusicbot.client"
-
 android {
     compileSdkVersion(28)
     defaultConfig {

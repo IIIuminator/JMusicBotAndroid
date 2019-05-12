@@ -3,8 +3,6 @@ plugins {
     kotlin("kapt")
 }
 
-group = "com.ivoberger.jmusicbot.client"
-
 dependencies {
     implementation(Libs.kotlin_stdlib_jdk8)
     implementation(Libs.kotlinx_coroutines_core)

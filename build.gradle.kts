@@ -16,6 +16,7 @@ plugins {
 }
 
 allprojects {
+    group = "com.ivoberger.jmusicbot-client"
     version = "0.8.0"
     repositories {
         google()
