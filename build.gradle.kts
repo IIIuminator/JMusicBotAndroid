@@ -24,6 +24,10 @@ allprojects {
     }
 }
 
+subprojects {
+    version = "0.8.0"
+}
+
 spotless {
     kotlin {
         target("**/java/**/*.kt")
