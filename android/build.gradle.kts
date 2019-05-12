@@ -3,7 +3,7 @@ plugins {
     kotlin("android")
     kotlin("android.extensions")
     kotlin("kapt")
-    id("com.github.dcendents.android-maven")
+//    id("com.github.dcendents.android-maven")
 }
 
 android {
@@ -31,8 +31,7 @@ dependencies {
 
     kapt(Libs.dagger_compiler)
     implementation(Libs.dagger)
-
     implementation(Libs.splitties_fun_pack_android_base)
-    testImplementation(Libs.assertj_core)
-    testImplementation("io.mockk:mockk:1.9.3")
 }
+
+apply { from("https://raw.githubusercontent.com/Commit451/gradle-android-javadocs/1.0.0/gradle-android-javadocs.gradle") }
