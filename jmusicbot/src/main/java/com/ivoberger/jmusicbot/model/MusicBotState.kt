@@ -1,13 +1,30 @@
+/*
+* Copyright 2019 Ivo Berger
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package com.ivoberger.jmusicbot.model
 
 import com.ivoberger.jmusicbot.di.ServerModule
 import com.ivoberger.jmusicbot.di.UserModule
+import kotlinx.coroutines.Job
 
 /**
  * Possible states for the musicBotService bot client to be in
  */
 sealed class State {
     override fun toString(): String = this::class.java.simpleName
+    var running: Job? = null
 
     /** Client has no server connection */
     object Disconnected : State()
@@ -44,12 +61,12 @@ sealed class State {
 sealed class Event {
     override fun toString(): String = this::class.java.simpleName
 
-    object OnStartDiscovery : Event()
-    class OnServerFound(baseUrl: String) : Event() {
+    object StartDiscovery : Event()
+    class ServerFound(baseUrl: String) : Event() {
         internal val serverModule: ServerModule = ServerModule(baseUrl)
     }
 
-    class OnAuthorize(
+    class Authorize(
         user: User,
         authToken: Auth.Token
     ) : Event() {
@@ -61,8 +78,8 @@ sealed class Event {
         }
     }
 
-    object OnAuthExpired : Event()
-    class OnDisconnect(val reason: Exception? = null) : Event()
+    object AuthExpired : Event()
+    class Disconnect(val reason: Exception? = null) : Event()
 }
 
 sealed class SideEffect {

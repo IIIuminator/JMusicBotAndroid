@@ -32,6 +32,10 @@ object Libs {
      * https://github.com/auth0/jwtdecode.android */
     const val jwtdecode: String = "com.auth0.android:jwtdecode:" + Versions.jwtdecode
 
+    const val com_diffplug_gradle_spotless_gradle_plugin: String =
+            "com.diffplug.gradle.spotless:com.diffplug.gradle.spotless.gradle.plugin:" +
+            Versions.com_diffplug_gradle_spotless_gradle_plugin
+
     const val com_github_dcendents_android_maven_gradle_plugin: String =
             "com.github.dcendents.android-maven:com.github.dcendents.android-maven.gradle.plugin:" +
             Versions.com_github_dcendents_android_maven_gradle_plugin

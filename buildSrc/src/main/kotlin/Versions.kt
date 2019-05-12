@@ -19,6 +19,8 @@ object Versions {
 
     const val jwtdecode: String = "1.3.0" 
 
+    const val com_diffplug_gradle_spotless_gradle_plugin: String = "3.23.0" 
+
     const val com_github_dcendents_android_maven_gradle_plugin: String = "2.1" 
 
     const val statemachine: String = "0.1.2" 
@@ -55,7 +57,7 @@ object Versions {
 
         const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.5-20190507000044+0000"
+        const val nightlyVersion: String = "5.5-20190512000035+0000"
 
         const val releaseCandidate: String = ""
     }
