@@ -15,7 +15,7 @@ object Versions {
 
     const val lint_gradle: String = "26.5.0-alpha13"
 
-    const val jwtdecode: String = "3.8.0"
+    const val java_jwt: String = "3.8.0"
 
     const val com_diffplug_gradle_spotless_gradle_plugin: String = "3.23.0"
 
@@ -27,7 +27,7 @@ object Versions {
 
     const val retrofit2_kotlin_coroutines_adapter: String = "0.9.2"
 
-    const val timber: String = "5.0.0-SNAPSHOT"
+    const val timber_jdk: String = "5.0.0-SNAPSHOT"
 
     const val splitties_fun_pack_android_base: String = "3.0.0-alpha06"
 
@@ -47,6 +47,8 @@ object Versions {
 
     const val org_jetbrains_kotlinx: String = "1.2.1"
 
+    const val junit_jupiter: String = "5.4.2"
+
     /**
      *
      *   To update Gradle, edit the wrapper file at path:
@@ -57,7 +59,7 @@ object Versions {
 
         const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.5-20190512000035+0000"
+        const val nightlyVersion: String = "5.5-20190514000037+0000"
 
         const val releaseCandidate: String = ""
     }

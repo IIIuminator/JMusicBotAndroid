@@ -28,8 +28,5 @@ dependencies {
     implementation(Libs.kotlinx_coroutines_android)
     implementation(Libs.core_ktx)
     implementation(Libs.lifecycle_extensions)
-
-    kapt(Libs.dagger_compiler)
-    implementation(Libs.dagger)
     implementation(Libs.splitties_fun_pack_android_base)
 }

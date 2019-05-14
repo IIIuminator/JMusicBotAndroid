@@ -8,13 +8,13 @@ dependencies {
     implementation(Libs.kotlin_stdlib_jdk8)
     implementation(Libs.kotlinx_coroutines_core)
 
-    api(Libs.timber)
+    api(Libs.timber_jdk)
     api(Libs.statemachine)
 
-    kapt(Libs.dagger_compiler)
     implementation(Libs.dagger)
+    kapt(Libs.dagger_compiler)
 
-    implementation(Libs.jwtdecode)
+    implementation(Libs.java_jwt)
     implementation(Libs.okhttp)
     implementation(Libs.logging_interceptor)
     implementation(Libs.retrofit)
@@ -23,6 +23,8 @@ dependencies {
     implementation(Libs.moshi)
     kapt(Libs.moshi_kotlin_codegen)
 
+    testImplementation(Libs.junit_jupiter)
+    testImplementation(Libs.kotlinx_coroutines_test)
     testImplementation(Libs.assertj_core)
     testImplementation(Libs.mockk)
 }
