@@ -33,4 +33,4 @@ class AuthException : Exception {
 
 class UsernameTakenException : Exception("Username already in use")
 
-class ServerErrorException(code: Int) : Exception("Server error $code")
+class ServerErrorException(val code: Int) : Exception("Server error $code")
