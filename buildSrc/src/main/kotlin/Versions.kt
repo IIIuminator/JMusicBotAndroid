@@ -41,7 +41,7 @@ object Versions {
 
     const val mockk: String = "1.9.3"
 
-    const val assertj_core: String = "3.12.2"
+    const val strikt_core: String = "0.20.1"
 
     const val org_jetbrains_kotlin: String = "1.3.31"
 

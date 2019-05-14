@@ -15,16 +15,81 @@
 */
 package com.ivoberger.jmusicbot.client.model
 
+import com.ivoberger.jmusicbot.client.JMusicBot
 import com.ivoberger.jmusicbot.client.di.ServerModule
 import com.ivoberger.jmusicbot.client.di.UserModule
-import kotlinx.coroutines.Job
+import com.tinder.StateMachine
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.sendBlocking
+import timber.log.Timber
+import timber.log.debug
+
+@ExperimentalCoroutinesApi
+internal val JMusicBot.stateMachine: StateMachine<State, Event, SideEffect>
+    get() = StateMachine.create {
+        initialState(State.Disconnected)
+        state<State.Disconnected> {
+            on<Event.StartDiscovery> { transitionTo(State.Discovering) }
+        }
+        state<State.Discovering> {
+            on<Event.ServerFound> {
+                transitionTo(State.AuthRequired, SideEffect.StartServerSession)
+            }
+            on<Event.Disconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
+        }
+        state<State.AuthRequired> {
+            on<Event.Authorize> { transitionTo(State.Connected, SideEffect.StartUserSession) }
+            on<Event.Disconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
+        }
+        state<State.Connected> {
+            on<Event.AuthExpired> { transitionTo(State.AuthRequired, SideEffect.EndUserSession) }
+            on<Event.Disconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
+        }
+        onTransition { transition ->
+            val validTransition = transition as? StateMachine.Transition.Valid
+            validTransition?.let { trans ->
+                Timber.debug { "State transition from ${trans.fromState} to ${trans.toState} by ${trans.event}" }
+                when (trans.sideEffect) {
+                    is SideEffect.StartServerSession -> {
+                        val event = trans.event as Event.ServerFound
+                        mServerSession =
+                            JMusicBot.mBaseComponent.serverSession(event.serverModule)
+                        mServiceClient = mServerSession!!.musicBotService()
+                    }
+                    is SideEffect.StartUserSession -> {
+                        val event = trans.event as Event.Authorize
+                        mUserSession =
+                            mServerSession!!.userSession(event.userModule)
+                        mServiceClient = mUserSession!!.musicBotService()
+                        connectionListeners.forEach { it.onConnectionRecovered() }
+                    }
+                    SideEffect.EndUserSession -> {
+                        user = null
+                        mUserSession = null
+                        mServiceClient = mServerSession!!.musicBotService()
+                    }
+                    SideEffect.EndServerSession -> {
+                        user = null
+                        mUserSession = null
+                        mServerSession = null
+                        if (trans.fromState is State.Discovering) return@onTransition
+                        val event = trans.event as Event.Disconnect
+                        connectionListeners.forEach { it.onConnectionLost(event.reason) }
+                    }
+                }
+                stateBroadcast.sendBlocking(trans.toState)
+                return@onTransition
+            }
+            val invalidTransition = transition as? StateMachine.Transition.Invalid
+            invalidTransition?.let { Timber.debug { "Attempted state transition from ${it.fromState} by ${it.event}" } }
+        }
+    }
 
 /**
  * Possible states for the musicBotService bot jmusicbot.jmusicbot.client to be in
  */
 sealed class State {
     override fun toString(): String = this::class.java.simpleName
-    var running: Job? = null
 
     /** Client has no server connection */
     object Disconnected : State()

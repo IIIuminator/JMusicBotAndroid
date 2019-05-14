@@ -24,6 +24,7 @@ import com.ivoberger.jmusicbot.client.exceptions.ServerErrorException
 import com.ivoberger.jmusicbot.client.exceptions.UsernameTakenException
 import com.ivoberger.jmusicbot.client.model.Auth
 import com.ivoberger.jmusicbot.client.model.Event
+import com.ivoberger.jmusicbot.client.model.stateMachine
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import okhttp3.OkHttpClient
@@ -57,6 +58,7 @@ internal fun listenForServerMulticast(): String? {
     }
 }
 
+@ExperimentalCoroutinesApi
 internal fun OkHttpClient.Builder.withToken(token: Auth.Token) = addInterceptor { chain ->
     chain.proceed(
         chain.request().newBuilder().header(KEY_AUTHORIZATION, token.toAuthHeader()).build()

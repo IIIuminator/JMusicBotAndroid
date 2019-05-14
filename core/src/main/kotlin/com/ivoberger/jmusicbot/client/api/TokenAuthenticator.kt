@@ -51,7 +51,6 @@ class TokenAuthenticator : Authenticator {
                         Timber.debug { "TOKEN Auth" }
                         if (!JMusicBot.state.hasServer) {
                             JMusicBot.discoverHost()
-                            JMusicBot.state.running?.join()
                         }
                         JMusicBot.user?.let { JMusicBot.authorize(it) }
                         JMusicBot.authToken?.toAuthHeader()

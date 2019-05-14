@@ -102,8 +102,8 @@ object Libs {
     const val mockk: String = "io.mockk:mockk:" + Versions.mockk
 
     /**
-     * http://assertj.org */
-    const val assertj_core: String = "org.assertj:assertj-core:" + Versions.assertj_core
+     * https://strikt.io/ */
+    const val strikt_core: String = "io.strikt:strikt-core:" + Versions.strikt_core
 
     /**
      * https://kotlinlang.org/ */

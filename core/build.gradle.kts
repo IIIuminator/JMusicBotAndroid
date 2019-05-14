@@ -4,6 +4,8 @@ plugins {
     maven
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> { kotlinOptions.jvmTarget = "1.8" }
+
 dependencies {
     implementation(Libs.kotlin_stdlib_jdk8)
     implementation(Libs.kotlinx_coroutines_core)
@@ -25,6 +27,6 @@ dependencies {
 
     testImplementation(Libs.junit_jupiter)
     testImplementation(Libs.kotlinx_coroutines_test)
-    testImplementation(Libs.assertj_core)
+    testImplementation(Libs.strikt_core)
     testImplementation(Libs.mockk)
 }
