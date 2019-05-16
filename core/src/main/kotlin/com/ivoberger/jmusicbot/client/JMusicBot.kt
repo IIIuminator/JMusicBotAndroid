@@ -74,7 +74,7 @@ object JMusicBot {
 
     var baseUrl: String? = null
         get() = mServerSession?.baseUrl() ?: field
-        private set
+        internal set
 
     internal var mServiceClient: MusicBotService? = null
 
@@ -99,9 +99,6 @@ object JMusicBot {
         set(value) {
             Timber.debug { "Setting token to $value" }
             field = value
-            field?.let {
-                user?.permissions = it.permissions
-            }
         }
 
     @Throws(

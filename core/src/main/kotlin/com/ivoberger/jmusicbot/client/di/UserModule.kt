@@ -22,6 +22,7 @@ import com.ivoberger.jmusicbot.client.model.Auth
 import com.ivoberger.jmusicbot.client.model.User
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Named
@@ -41,6 +42,7 @@ internal class UserModule(private val mUser: User, private val mAuthToken: Auth.
         client: OkHttpClient
     ): Retrofit = retrofitBuilder.client(client).build()
 
+    @ExperimentalCoroutinesApi
     @Provides
     fun okHttpClient(okHttpClientBuilder: OkHttpClient.Builder, authToken: Auth.Token) =
         okHttpClientBuilder.authenticator(TokenAuthenticator()).withToken(authToken)
