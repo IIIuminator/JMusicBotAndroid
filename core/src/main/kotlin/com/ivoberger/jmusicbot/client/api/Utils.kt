@@ -24,7 +24,6 @@ import com.ivoberger.jmusicbot.client.exceptions.ServerErrorException
 import com.ivoberger.jmusicbot.client.exceptions.UsernameTakenException
 import com.ivoberger.jmusicbot.client.model.Auth
 import com.ivoberger.jmusicbot.client.model.Event
-import com.ivoberger.jmusicbot.client.model.stateMachine
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import okhttp3.OkHttpClient

@@ -18,13 +18,12 @@ package com.ivoberger.jmusicbot.client.model
 import com.ivoberger.jmusicbot.client.JMusicBot
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import java.util.UUID
 
 @JsonClass(generateAdapter = true)
 class User(
     @Json(name = "name") val name: String,
     password: String? = null,
-    @Json(name = "userId") val id: String = UUID.randomUUID().toString(),
+    @Json(name = "userId") val id: String,
     @Json(name = "permissions") permissions: List<Permissions> = listOf()
 ) {
 

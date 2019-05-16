@@ -40,7 +40,7 @@ import com.ivoberger.jmusicbot.client.model.Song
 import com.ivoberger.jmusicbot.client.model.State
 import com.ivoberger.jmusicbot.client.model.User
 import com.ivoberger.jmusicbot.client.model.VersionInfo
-import com.ivoberger.jmusicbot.client.model.stateMachine
+import com.ivoberger.jmusicbot.client.model.makeStateMachine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BroadcastChannel
@@ -57,6 +57,8 @@ import kotlin.concurrent.timer
 @Suppress("unused")
 @ExperimentalCoroutinesApi
 object JMusicBot {
+
+    internal val stateMachine = makeStateMachine()
 
     val state: State
         get() = stateMachine.state

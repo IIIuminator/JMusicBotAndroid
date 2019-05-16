@@ -29,4 +29,6 @@ dependencies {
     testImplementation(Libs.kotlinx_coroutines_test)
     testImplementation(Libs.strikt_core)
     testImplementation(Libs.mockk)
+
+    testImplementation("com.github.debop:koda-time:1.2.1")
 }

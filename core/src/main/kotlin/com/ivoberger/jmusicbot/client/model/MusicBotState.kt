@@ -25,8 +25,8 @@ import timber.log.Timber
 import timber.log.debug
 
 @ExperimentalCoroutinesApi
-internal val JMusicBot.stateMachine: StateMachine<State, Event, SideEffect>
-    get() = StateMachine.create {
+internal fun JMusicBot.makeStateMachine(): StateMachine<State, Event, SideEffect> =
+    StateMachine.create {
         initialState(State.Disconnected)
         state<State.Disconnected> {
             on<Event.StartDiscovery> { transitionTo(State.Discovering) }
@@ -52,14 +52,12 @@ internal val JMusicBot.stateMachine: StateMachine<State, Event, SideEffect>
                 when (trans.sideEffect) {
                     is SideEffect.StartServerSession -> {
                         val event = trans.event as Event.ServerFound
-                        mServerSession =
-                            JMusicBot.mBaseComponent.serverSession(event.serverModule)
+                        mServerSession = JMusicBot.mBaseComponent.serverSession(event.serverModule)
                         mServiceClient = mServerSession!!.musicBotService()
                     }
                     is SideEffect.StartUserSession -> {
                         val event = trans.event as Event.Authorize
-                        mUserSession =
-                            mServerSession!!.userSession(event.userModule)
+                        mUserSession = mServerSession!!.userSession(event.userModule)
                         mServiceClient = mUserSession!!.musicBotService()
                         connectionListeners.forEach { it.onConnectionRecovered() }
                     }
