@@ -18,35 +18,19 @@ package com.ivoberger.jmusicbot.client.model
 import com.ivoberger.jmusicbot.client.JMusicBot
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @JsonClass(generateAdapter = true)
 class User(
     @Json(name = "name") val name: String,
-    password: String? = null,
+    @Json(name = "password") var password: String? = null,
     @Json(name = "userId") val id: String,
-    @Json(name = "permissions") permissions: List<Permissions> = listOf()
+    @Json(name = "permissions") var permissions: List<Permissions> = listOf()
 ) {
 
-    @Json(name = "password")
-    var password: String? = password
-        set(value) {
-            field = value
-            JMusicBot.user = this
-        }
-
-    @Json(name = "permissions")
-    var permissions: List<Permissions> = permissions
-        set(value) {
-            field = value
-            JMusicBot.user = this
-        }
-
     companion object {
-        private val mUserAdapter by lazy {
-            JMusicBot.mBaseComponent.moshi.adapter<User>(
-                User::class.java
-            )
-        }
+        private val mUserAdapter by lazy { JMusicBot.mBaseComponent.moshi.adapter<User>(User::class.java) }
     }
 
     override fun toString(): String = mUserAdapter.toJson(this@User)

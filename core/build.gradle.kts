@@ -2,9 +2,23 @@ plugins {
     kotlin("jvm")
     kotlin("kapt")
     maven
+    jacoco
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> { kotlinOptions.jvmTarget = "1.8" }
+tasks.jacocoTestReport {
+    reports {
+        xml.isEnabled = false
+        csv.isEnabled = false
+        html.destination = file("${buildDir}/jacocoHtml")
+    }
+}
+
+tasks.compileKotlin { kotlinOptions.jvmTarget = "1.8" }
+tasks.compileTestKotlin { kotlinOptions.jvmTarget = "1.8" }
+tasks.test {
+    useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
 
 dependencies {
     implementation(Libs.kotlin_stdlib_jdk8)

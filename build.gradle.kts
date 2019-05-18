@@ -28,7 +28,7 @@ allprojects {
 
 spotless {
     kotlin {
-        target("**/java/**/*.kt")
+        target("**/kotlin/**/*.kt")
         ktlint()
         licenseHeader(
             "/*\n" +
