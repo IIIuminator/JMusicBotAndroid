@@ -36,12 +36,12 @@ import java.net.InetAddress
 import java.net.MulticastSocket
 
 private const val GROUP_ADDRESS = "224.0.0.142"
-internal const val PORT = 42945
+internal const val DEFAULT_PORT = 42945
 private const val SOCKET_TIMEOUT = 4000
 
-internal fun listenForServerMulticast(): String? {
+internal fun listenForServerMulticast(port: Int): String? {
     return try {
-        MulticastSocket(PORT).use { socket ->
+        MulticastSocket(port).use { socket ->
             val groupAddress = InetAddress.getByName(GROUP_ADDRESS)
             socket.joinGroup(groupAddress)
             socket.soTimeout = SOCKET_TIMEOUT

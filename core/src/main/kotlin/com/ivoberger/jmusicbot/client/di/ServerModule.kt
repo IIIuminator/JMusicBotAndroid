@@ -22,11 +22,15 @@ import retrofit2.Retrofit
 import javax.inject.Named
 
 @Module
-internal class ServerModule(private val baseUrl: String) {
+internal class ServerModule(private val hostAddress: String, private val port: Int) {
 
     @Provides
     @Named(NameKeys.BASE_URL)
-    fun baseUrl(): String = baseUrl
+    fun baseUrl(): String = "http://$hostAddress:$port/"
+
+    @Provides
+    @Named(NameKeys.PORT)
+    fun port(): Int = port
 
     @Provides
     @Named(NameKeys.BUILDER_RETROFIT_URL)

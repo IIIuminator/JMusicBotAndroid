@@ -17,6 +17,7 @@ package com.ivoberger.jmusicbot.client.di
 
 internal object NameKeys {
     const val BASE_URL = "baseUrl"
+    const val PORT = "port"
 
     const val BUILDER_RETROFIT_BASE = "basicRetrofitBuilder"
     const val BUILDER_RETROFIT_URL = "urlRetrofitBuilder"

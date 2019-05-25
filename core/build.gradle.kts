@@ -9,7 +9,7 @@ tasks.jacocoTestReport {
     reports {
         xml.isEnabled = false
         csv.isEnabled = false
-        html.destination = file("${buildDir}/jacocoHtml")
+        html.destination = file("$buildDir/jacocoHtml")
     }
 }
 
@@ -43,6 +43,7 @@ dependencies {
     testImplementation(Libs.kotlinx_coroutines_test)
     testImplementation(Libs.strikt_core)
     testImplementation(Libs.mockk)
-
-    testImplementation("com.github.debop:koda-time:1.2.1")
+    testImplementation(Libs.retrofit_mock)
+    testImplementation(Libs.mockwebserver)
+    testImplementation(Libs.koda_time)
 }

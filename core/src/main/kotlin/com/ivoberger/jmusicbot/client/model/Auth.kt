@@ -21,20 +21,22 @@ import com.ivoberger.jmusicbot.client.exceptions.InvalidParametersException
 import com.ivoberger.jmusicbot.client.utils.base64encoded
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.Date
 import java.util.UUID
 
+@ExperimentalCoroutinesApi
 sealed class Auth {
 
     @JsonClass(generateAdapter = true)
-    class Register(
+    data class Register(
         @Json(name = "name") val name: String,
         @Json(name = "userId") val uuid: String = UUID.randomUUID().toString()
     ) : Auth() {
         constructor(user: User) : this(user.name, user.id)
     }
 
-    class Basic(val name: String, val password: String) : Auth() {
+    data class Basic(val name: String, val password: String) : Auth() {
         constructor(user: User) : this(
             user.name,
             user.password ?: throw InvalidParametersException(
@@ -47,14 +49,10 @@ sealed class Auth {
             "Basic ${"$name:$password".base64encoded.trim()}"
     }
 
-    class Token(private val token: String) : Auth() {
+    data class Token(private val token: String) : Auth() {
 
         private val jwt by lazy { JWT.decode(token) }
-        val permissions by lazy {
-            Permissions.fromClaims(
-                jwt.claims
-            )
-        }
+        val permissions by lazy { Permissions.fromClaims(jwt.claims) }
 
         override fun toString(): String = token
         fun toAuthHeader() = "Bearer $token"
@@ -62,7 +60,7 @@ sealed class Auth {
     }
 
     @JsonClass(generateAdapter = true)
-    class PasswordChange(@Json(name = "newPassword") val newPassword: String) : Auth()
+    data class PasswordChange(@Json(name = "newPassword") val newPassword: String) : Auth()
 }
 
 @JsonClass(generateAdapter = true)

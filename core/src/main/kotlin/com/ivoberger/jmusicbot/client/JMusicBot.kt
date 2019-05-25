@@ -15,8 +15,8 @@
 */
 package com.ivoberger.jmusicbot.client
 
+import com.ivoberger.jmusicbot.client.api.DEFAULT_PORT
 import com.ivoberger.jmusicbot.client.api.MusicBotService
-import com.ivoberger.jmusicbot.client.api.PORT
 import com.ivoberger.jmusicbot.client.api.listenForServerMulticast
 import com.ivoberger.jmusicbot.client.api.process
 import com.ivoberger.jmusicbot.client.di.BaseComponent
@@ -115,27 +115,24 @@ object JMusicBot {
         )
     }
 
-    suspend fun discoverHost(knownHost: String? = null) = withContext(Dispatchers.IO) {
-        if (state.isDiscovering) return@withContext
-        Timber.debug { "Discovering host" }
-        if (!state.isDisconnected) stateMachine.transition(
-            Event.Disconnect()
-        )
-        stateMachine.transition(Event.StartDiscovery)
-        val hostAddress = knownHost ?: listenForServerMulticast()
-        hostAddress?.let {
-            baseUrl = knownHost ?: "http://$it:$PORT/"
-            Timber.debug { "Found host: $baseUrl" }
-            stateMachine.transition(
-                Event.ServerFound(
-                    baseUrl!!
-                )
+    suspend fun discoverHost(knownHost: String? = null, port: Int = DEFAULT_PORT) =
+        withContext(Dispatchers.IO) {
+            if (state.isDiscovering) return@withContext
+            Timber.debug { "Discovering host" }
+            if (!state.isDisconnected) stateMachine.transition(
+                Event.Disconnect()
             )
-            return@withContext
+            stateMachine.transition(Event.StartDiscovery)
+            val hostAddress = knownHost ?: listenForServerMulticast(port)
+            hostAddress?.let {
+                baseUrl = knownHost ?: it
+                Timber.debug { "Found host: $baseUrl" }
+                stateMachine.transition(Event.ServerFound(baseUrl!!, port))
+                return@withContext
+            }
+            Timber.debug { "No host found" }
+            stateMachine.transition(Event.Disconnect())
         }
-        Timber.debug { "No host found" }
-        stateMachine.transition(Event.Disconnect())
-    }
 
     @Throws(
         InvalidParametersException::class, NotFoundException::class,
@@ -144,7 +141,7 @@ object JMusicBot {
     suspend fun authorize(authUser: User, token: String? = null) = withContext(Dispatchers.IO) {
         state.serverCheck()
         Timber.debug { "Starting authorization" }
-        stateMachine.transition(Event.AuthExpired)
+        if (!state.authRequired) stateMachine.transition(Event.AuthExpired)
         user = authUser
         token?.let { authToken = Auth.Token(it) }
         if (tokenValid()) return@withContext

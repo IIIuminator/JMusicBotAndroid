@@ -105,8 +105,10 @@ sealed class State {
         get() = this == Disconnected
     val isDiscovering
         get() = this == Discovering
-    val hasServer
+    val authRequired
         get() = this == AuthRequired
+    val hasServer
+        get() = authRequired
     val isConnected: Boolean
         get() = this == Connected
 
@@ -125,9 +127,8 @@ sealed class Event {
     override fun toString(): String = this::class.java.simpleName
 
     object StartDiscovery : Event()
-    class ServerFound(baseUrl: String) : Event() {
-        internal val serverModule: ServerModule =
-            ServerModule(baseUrl)
+    class ServerFound(baseUrl: String, port: Int) : Event() {
+        internal val serverModule: ServerModule = ServerModule(baseUrl, port)
     }
 
     class Authorize(

@@ -21,6 +21,7 @@ import com.squareup.moshi.Json
 import timber.log.Timber
 import timber.log.debug
 import timber.log.error
+import java.util.Locale
 
 enum class Permissions(val label: String) {
     /**
@@ -71,9 +72,9 @@ enum class Permissions(val label: String) {
             val permissions = mutableListOf<Permissions>()
             claims["permissions"]?.asList(String::class.java)?.forEach {
                 try {
-                    permissions.add(valueOf(it.toUpperCase()))
+                    permissions.add(valueOf(it.toUpperCase(Locale.getDefault())))
                 } catch (e: IllegalArgumentException) {
-                    Timber.error(e) { "Unknown Permission: ${it.toUpperCase()}" }
+                    Timber.error(e) { "Unknown Permission: ${it.toUpperCase(Locale.getDefault())}" }
                 }
             }
             Timber.debug { "Retrieved permissions from token claims: $permissions" }
@@ -81,6 +82,6 @@ enum class Permissions(val label: String) {
         }
 
         @FromJson
-        fun fromJson(permString: String) = valueOf(permString.toUpperCase())
+        fun fromJson(permString: String) = valueOf(permString.toUpperCase(Locale.getDefault()))
     }
 }

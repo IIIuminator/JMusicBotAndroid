@@ -40,6 +40,8 @@ object Libs {
             "com.github.dcendents.android-maven:com.github.dcendents.android-maven.gradle.plugin:" +
             Versions.com_github_dcendents_android_maven_gradle_plugin
 
+    const val koda_time: String = "com.github.debop:koda-time:" + Versions.koda_time
+
     /**
      * https://github.com/Tinder/StateMachine */
     const val statemachine: String = "com.github.tinder:statemachine:" + Versions.statemachine
@@ -81,11 +83,21 @@ object Libs {
 
     /**
      * https://github.com/square/okhttp */
+    const val mockwebserver: String = "com.squareup.okhttp3:mockwebserver:" +
+            Versions.com_squareup_okhttp3
+
+    /**
+     * https://github.com/square/okhttp */
     const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.com_squareup_okhttp3
 
     /**
      * https://github.com/square/retrofit/ */
     const val converter_moshi: String = "com.squareup.retrofit2:converter-moshi:" +
+            Versions.com_squareup_retrofit2
+
+    /**
+     * https://github.com/square/retrofit/ */
+    const val retrofit_mock: String = "com.squareup.retrofit2:retrofit-mock:" +
             Versions.com_squareup_retrofit2
 
     /**

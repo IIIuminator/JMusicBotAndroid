@@ -15,11 +15,13 @@ object Versions {
 
     const val lint_gradle: String = "26.5.0-alpha13"
 
-    const val java_jwt: String = "3.8.0"
+    const val java_jwt: String = "3.8.1"
 
     const val com_diffplug_gradle_spotless_gradle_plugin: String = "3.23.0"
 
     const val com_github_dcendents_android_maven_gradle_plugin: String = "2.1"
+
+    const val koda_time: String = "2.0.0"
 
     const val statemachine: String = "0.1.2"
 
@@ -33,7 +35,7 @@ object Versions {
 
     const val com_squareup_moshi: String = "1.8.0"
 
-    const val com_squareup_okhttp3: String = "3.14.1"
+    const val com_squareup_okhttp3: String = "3.14.2"
 
     const val com_squareup_retrofit2: String = "2.5.0"
 
@@ -59,7 +61,7 @@ object Versions {
 
         const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.5-20190514000037+0000"
+        const val nightlyVersion: String = "5.6-20190525002310+0000"
 
         const val releaseCandidate: String = ""
     }
