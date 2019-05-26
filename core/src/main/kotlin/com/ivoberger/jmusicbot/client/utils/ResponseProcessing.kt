@@ -51,25 +51,15 @@ internal suspend inline fun <reified T> Deferred<Response<T>>.process(
     return when (response.code()) {
         in successCodes -> response.body()
         in errorCodes -> throw errorCodes.getValue(response.code())
-        400 -> throw InvalidParametersException(
-            invalidParamsType,
-            response.errorBody()!!.string()
-        )
-        401 -> throw AuthException(
-            AuthException.Reason.NEEDS_AUTH,
-            response.errorBody()!!.string()
-        )
+        400 -> throw InvalidParametersException(invalidParamsType, response.errorBody()!!.string())
+        401 -> throw AuthException(AuthException.Reason.NEEDS_AUTH, response.errorBody()!!.string())
         403 -> throw AuthException(
-            AuthException.Reason.NEEDS_PERMISSION,
-            response.errorBody()!!.string()
+            AuthException.Reason.NEEDS_PERMISSION, response.errorBody()!!.string()
         )
-        404 -> throw NotFoundException(
-            notFoundType,
-            response.errorBody()!!.string()
-        )
+        404 -> throw NotFoundException(notFoundType, response.errorBody()!!.string())
         409 -> throw UsernameTakenException()
         else -> {
-            Timber.error { "Server Error: ${response.errorBody()!!.string()}, ${response.code()}" }
+            Timber.error { "Server Error: ${response.errorBody()?.string()}, ${response.code()}" }
             throw ServerErrorException(response.code())
         }
     }

@@ -22,7 +22,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 @JsonClass(generateAdapter = true)
-class User(
+data class User(
     @Json(name = "name") val name: String,
     @Json(name = "password") var password: String? = null,
     @Json(name = "userId") val id: String,

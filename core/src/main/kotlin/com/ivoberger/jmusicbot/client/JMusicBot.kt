@@ -128,7 +128,7 @@ object JMusicBot {
         state.serverCheck()
         Timber.debug { "Starting authorization" }
         if (!state.authRequired) stateMachine.transition(Event.AuthExpired)
-        if (tokenValid(token)) return@withContext
+        if (tokenValid(authUser, token)) return@withContext
         try {
             register(authUser)
             if (!authUser.password.isNullOrBlank()) changePassword(
@@ -144,7 +144,7 @@ object JMusicBot {
         }
         try {
             login(authUser)
-            if (tokenValid(token)) return@withContext
+            if (tokenValid(authUser, token)) return@withContext
         } catch (e: Exception) {
             Timber.warn(e) { e.message ?: "" }
             Timber.debug { "Authorization failed" }
@@ -152,7 +152,7 @@ object JMusicBot {
         }
     }
 
-    private suspend fun tokenValid(authToken: Auth.Token?): Boolean {
+    private suspend fun tokenValid(authUser: User, authToken: Auth.Token?): Boolean {
         if (authToken == null) {
             Timber.debug { "Invalid Token: No token stored" }
             return false
@@ -163,14 +163,14 @@ object JMusicBot {
                 return false
             }
             val tmpUser = mServiceClient!!.testToken(authToken.toAuthHeader()).process()
-            if (tmpUser?.name == user?.name) {
-                Timber.debug { "Valid Token: ${user?.name}" }
-                stateMachine.transition(Event.Authorize(user!!, authToken))
+            if (tmpUser?.name == authUser.name) {
+                Timber.debug { "Valid Token: ${authUser.name}" }
+                stateMachine.transition(Event.Authorize(authUser, authToken))
                 return true
             }
             Timber.debug { "Invalid Token: User changed" }
         } catch (e: Exception) {
-            Timber.debug { "Invalid Token: Test failed (${e.localizedMessage}" }
+            Timber.debug { "Invalid Token: Test failed (${e.message})" }
         }
         return false
     }
@@ -197,7 +197,8 @@ object JMusicBot {
         state.serverCheck()
         val credentials = Auth.Basic(user).toAuthHeader()
         Timber.debug { "Auth: $credentials" }
-        val token = mServiceClient!!.loginUser(credentials).process()!!
+        val token =
+            mServiceClient!!.loginUser(credentials).process(notFoundType = NotFoundException.Type.USER)!!
         Timber.debug { "Logged in ${user.name}" }
         stateMachine.transition(Event.Authorize(user, Auth.Token(token)))
     }

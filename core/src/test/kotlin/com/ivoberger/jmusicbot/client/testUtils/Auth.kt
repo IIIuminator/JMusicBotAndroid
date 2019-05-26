@@ -26,6 +26,13 @@ fun User.toToken(): String = JWT.create()
     .withArrayClaim("permissions", permissions.map { it.label }.toTypedArray())
     .sign(testSigningAlgo)
 
+fun User.toExpiredToken(): String = JWT.create()
+    .withSubject(name)
+    .withIssuedAt(Date.from(Instant.now() - (Duration.ofMinutes(15))))
+    .withExpiresAt(Date.from(Instant.now() - (Duration.ofMinutes(10))))
+    .withArrayClaim("permissions", permissions.map { it.label }.toTypedArray())
+    .sign(testSigningAlgo)
+
 fun String.userFromToken(): User {
     val decodedToken = JWT.require(testSigningAlgo).build().verify(this)
     val name = decodedToken.subject

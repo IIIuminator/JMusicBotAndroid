@@ -27,7 +27,7 @@ import com.ivoberger.jmusicbot.client.model.PlayerState
 import com.ivoberger.jmusicbot.client.model.PlayerStateChange
 import com.ivoberger.jmusicbot.client.model.QueueEntry
 import com.ivoberger.jmusicbot.client.model.Song
-import com.ivoberger.jmusicbot.client.model.User
+import com.ivoberger.jmusicbot.client.model.UserInfo
 import com.ivoberger.jmusicbot.client.model.VersionInfo
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
@@ -65,7 +65,7 @@ internal interface MusicBotService {
     @GET(URL_USER)
     fun testToken(
         @Header(KEY_AUTHORIZATION) authToken: String
-    ): Deferred<Response<User>>
+    ): Deferred<Response<UserInfo>>
 
     // Song operations
 

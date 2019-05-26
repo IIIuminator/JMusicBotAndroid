@@ -1,10 +1,17 @@
 package com.ivoberger.jmusicbot.client
 
+import com.ivoberger.jmusicbot.client.exceptions.AuthException
+import com.ivoberger.jmusicbot.client.exceptions.NotFoundException
 import com.ivoberger.jmusicbot.client.exceptions.UsernameTakenException
+import com.ivoberger.jmusicbot.client.model.Auth
+import com.ivoberger.jmusicbot.client.model.AuthExpectation
+import com.ivoberger.jmusicbot.client.model.AuthExpectationJsonAdapter
+import com.ivoberger.jmusicbot.client.model.AuthType
 import com.ivoberger.jmusicbot.client.model.Event
 import com.ivoberger.jmusicbot.client.testUtils.enterAuthRequiredState
 import com.ivoberger.jmusicbot.client.testUtils.testUser
 import com.ivoberger.jmusicbot.client.testUtils.testUserName
+import com.ivoberger.jmusicbot.client.testUtils.toExpiredToken
 import com.ivoberger.jmusicbot.client.testUtils.toToken
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -62,24 +69,103 @@ internal class AuthTest {
     @Test
     fun validRegister() = runBlocking {
         val token = testUser.toToken()
-        mMockServer.enqueue(MockResponse().setBody(token))
+        mMockServer.enqueue(MockResponse().setResponseCode(201).setBody(token))
         JMusicBot.authorize(testUser)
-        expect {
-            that(JMusicBot.authToken.toString()).isEqualTo(token)
-            that(JMusicBot.user?.name).isEqualTo(testUserName)
-            that(JMusicBot.user?.permissions).isEqualTo(testUser.permissions)
-            that(JMusicBot.state.isConnected).isTrue()
-        }
+        checkForAuthSuccess(token)
     }
 
     @Test
-    fun invalidRegister() = runBlocking {
+    fun usernameTakenRegister() = runBlocking {
         mMockServer.enqueue(MockResponse().setResponseCode(409))
         expectThrows<UsernameTakenException> { JMusicBot.authorize(testUser) }
-        expect {
-            that(JMusicBot.authToken).isNull()
-            that(JMusicBot.user).isNull()
-            that(JMusicBot.state.hasServer).isTrue()
+        checkForAuthFailure()
+    }
+
+    @Test
+    fun validLogin() = runBlocking {
+        val token = testUser.toToken()
+        val user = testUser.copy().apply { password = "password" }
+        mMockServer.enqueue(MockResponse().setResponseCode(409))
+        mMockServer.enqueue(MockResponse().setBody(token))
+        JMusicBot.authorize(user)
+        checkForAuthSuccess(token)
+    }
+
+    @Test
+    fun unknownUserLogin() = runBlocking {
+        val user = testUser.copy().apply { password = "password" }
+        mMockServer.enqueue(MockResponse().setResponseCode(409))
+        mMockServer.enqueue(MockResponse().setResponseCode(404))
+        expectThrows<NotFoundException> { JMusicBot.authorize(user) }
+            .get { type }.isEqualTo(NotFoundException.Type.USER)
+        checkForAuthFailure()
+    }
+
+    @Test
+    fun wrongPasswordLogin() = runBlocking {
+        val msg = """{ "format": "Basic", "type": "Full" }"""
+        val user = testUser.copy().apply { password = "password" }
+        mMockServer.enqueue(MockResponse().setResponseCode(409))
+        mMockServer.enqueue(MockResponse().setResponseCode(401).setBody(msg))
+        expectThrows<AuthException> { JMusicBot.authorize(user) }.and {
+            get { reason }.isEqualTo(AuthException.Reason.NEEDS_AUTH)
+            get { AuthExpectationJsonAdapter(JMusicBot.mBaseComponent.moshi).fromJson(message!!) }
+                .isEqualTo(AuthExpectation(AuthType.BASIC, "Full", null))
         }
+        checkForAuthFailure()
+    }
+
+    @Test
+    fun authorizeWithValidToken() = runBlocking {
+        val msg = """{ "name": "$testUserName", "permissions" : ["enqueue"] }"""
+        val token = testUser.toToken()
+        mMockServer.enqueue(MockResponse().setResponseCode(200).setBody(msg))
+        JMusicBot.authorize(testUser, Auth.Token(token))
+        checkForAuthSuccess(token)
+    }
+
+    @Test
+    fun authorizeWithWrongUsersToken() = runBlocking {
+        val msg = """{ "name": "Wroooong", "permissions" : ["enqueue"] }"""
+        mMockServer.enqueue(MockResponse().setResponseCode(200).setBody(msg))
+        mMockServer.enqueue(MockResponse().setResponseCode(409))
+        expectThrows<UsernameTakenException> {
+            JMusicBot.authorize(testUser, Auth.Token(testUser.toToken()))
+        }
+        checkForAuthFailure()
+    }
+
+    @Test
+    fun authorizeWithInvalidToken() = runBlocking {
+        mMockServer.enqueue(MockResponse().setResponseCode(401).setBody("Invalid token"))
+        mMockServer.enqueue(MockResponse().setResponseCode(409))
+        expectThrows<UsernameTakenException> {
+            JMusicBot.authorize(testUser, Auth.Token(testUser.toToken()))
+        }
+        checkForAuthFailure()
+    }
+
+    @Test
+    fun authorizeWithExpiredToken() = runBlocking {
+        mMockServer.enqueue(MockResponse().setResponseCode(409))
+        expectThrows<UsernameTakenException> {
+            JMusicBot.authorize(testUser, Auth.Token(testUser.toExpiredToken()))
+        }
+        checkForAuthFailure()
+    }
+
+    // Util funcs
+
+    private fun checkForAuthSuccess(token: String) = expect {
+        that(JMusicBot.authToken.toString()).isEqualTo(token)
+        that(JMusicBot.user?.name).isEqualTo(testUserName)
+        that(JMusicBot.user?.permissions).isEqualTo(testUser.permissions)
+        that(JMusicBot.state.isConnected).isTrue()
+    }
+
+    private fun checkForAuthFailure() = expect {
+        that(JMusicBot.authToken).isNull()
+        that(JMusicBot.user).isNull()
+        that(JMusicBot.state.hasServer).isTrue()
     }
 }
