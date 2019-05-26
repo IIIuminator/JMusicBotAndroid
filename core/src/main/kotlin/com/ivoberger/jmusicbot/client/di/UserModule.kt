@@ -17,9 +17,9 @@ package com.ivoberger.jmusicbot.client.di
 
 import com.ivoberger.jmusicbot.client.api.MusicBotService
 import com.ivoberger.jmusicbot.client.api.TokenAuthenticator
-import com.ivoberger.jmusicbot.client.api.withToken
 import com.ivoberger.jmusicbot.client.model.Auth
 import com.ivoberger.jmusicbot.client.model.User
+import com.ivoberger.jmusicbot.client.utils.withToken
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi

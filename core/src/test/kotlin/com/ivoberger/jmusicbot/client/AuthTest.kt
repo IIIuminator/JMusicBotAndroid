@@ -50,7 +50,6 @@ internal class AuthTest {
 
     @BeforeEach
     fun testSetUp() {
-
         JMusicBot.stateMachine.enterAuthRequiredState(Event.ServerFound(mBaseUrl, mPort))
         expectThat(JMusicBot.baseUrl).isEqualTo("http://$mBaseUrl:$mPort/")
     }

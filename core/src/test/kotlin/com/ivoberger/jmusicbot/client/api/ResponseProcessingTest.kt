@@ -6,6 +6,7 @@ import com.ivoberger.jmusicbot.client.exceptions.NotFoundException
 import com.ivoberger.jmusicbot.client.exceptions.ServerErrorException
 import com.ivoberger.jmusicbot.client.exceptions.UsernameTakenException
 import com.ivoberger.jmusicbot.client.model.VersionInfo
+import com.ivoberger.jmusicbot.client.utils.process
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runBlockingTest

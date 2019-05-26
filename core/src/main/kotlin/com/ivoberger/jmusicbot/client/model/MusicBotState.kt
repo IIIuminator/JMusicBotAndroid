@@ -43,6 +43,7 @@ internal fun JMusicBot.makeStateMachine(): StateMachine<State, Event, SideEffect
         }
         state<State.Connected> {
             on<Event.AuthExpired> { transitionTo(State.AuthRequired, SideEffect.EndUserSession) }
+            on<Event.Authorize> { transitionTo(State.Connected, SideEffect.StartUserSession) }
             on<Event.Disconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
         }
         onTransition { transition ->
@@ -62,12 +63,10 @@ internal fun JMusicBot.makeStateMachine(): StateMachine<State, Event, SideEffect
                         connectionListeners.forEach { it.onConnectionRecovered() }
                     }
                     SideEffect.EndUserSession -> {
-                        user = null
                         mUserSession = null
                         mServiceClient = mServerSession!!.musicBotService()
                     }
                     SideEffect.EndServerSession -> {
-                        user = null
                         mUserSession = null
                         mServerSession = null
                         if (trans.fromState is State.Discovering) return@onTransition
