@@ -9,11 +9,9 @@ object Versions {
 
     const val lifecycle_extensions: String = "2.1.0-alpha04"
 
-    const val aapt2: String = "3.5.0-alpha13-5435860"
+    const val com_android_tools_build_gradle: String = "3.6.0-alpha01"
 
-    const val com_android_tools_build_gradle: String = "3.5.0-alpha13"
-
-    const val lint_gradle: String = "26.5.0-alpha13"
+    const val lint_gradle: String = "26.6.0-alpha01"
 
     const val java_jwt: String = "3.8.1"
 
@@ -61,7 +59,7 @@ object Versions {
 
         const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.6-20190525002310+0000"
+        const val nightlyVersion: String = "5.6-20190526000036+0000"
 
         const val releaseCandidate: String = ""
     }
