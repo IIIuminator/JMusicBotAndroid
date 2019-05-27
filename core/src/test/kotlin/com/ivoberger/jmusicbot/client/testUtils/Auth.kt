@@ -11,13 +11,15 @@ import java.util.Date
 private const val testSigningKey = "totally secret"
 private val testSigningAlgo = Algorithm.HMAC512(testSigningKey)
 
-const val testUserName = "testUser"
+const val testUserName = "newTestUser"
 const val testUserId = "testUserId"
-val testUser = User(
+val newTestUser = User(
     testUserName,
     id = testUserId,
     permissions = listOf(Permissions.PAUSE, Permissions.ENQUEUE, Permissions.ALTER_SUGGESTIONS)
 )
+
+val existingTestUser = newTestUser.copy().apply { password = "password" }
 
 fun User.toToken(): String = JWT.create()
     .withSubject(name)

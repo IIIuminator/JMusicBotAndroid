@@ -6,7 +6,7 @@ import com.ivoberger.jmusicbot.client.model.State
 import com.ivoberger.jmusicbot.client.testUtils.enterAuthRequiredState
 import com.ivoberger.jmusicbot.client.testUtils.enterConnectedState
 import com.ivoberger.jmusicbot.client.testUtils.enterDiscoveringState
-import com.ivoberger.jmusicbot.client.testUtils.testUser
+import com.ivoberger.jmusicbot.client.testUtils.newTestUser
 import com.ivoberger.jmusicbot.client.testUtils.toToken
 import com.ivoberger.jmusicbot.client.utils.DEFAULT_PORT
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,10 +23,10 @@ internal class StateMachineTest {
 
     private val testAddress = "test"
     private val baseUrl = "http://$testAddress:$DEFAULT_PORT/"
-    private val authToken = Auth.Token(testUser.toToken())
+    private val authToken = Auth.Token(newTestUser.toToken())
 
     private val serverFoundEvent = Event.ServerFound(testAddress, DEFAULT_PORT)
-    private val authorizeEvent = Event.Authorize(testUser, authToken)
+    private val authorizeEvent = Event.Authorize(newTestUser, authToken)
 
     private val testEvents = listOf(
         Event.StartDiscovery,
@@ -85,7 +85,7 @@ internal class StateMachineTest {
         JMusicBot.stateMachine.enterConnectedState(serverFoundEvent, authorizeEvent)
         checkTransitions(listOf(Event.AuthExpired, Event.Disconnect()), State.Connected)
         expectThat(JMusicBot.baseUrl).isEqualTo(baseUrl)
-        expectThat(JMusicBot.user).isEqualTo(testUser)
+        expectThat(JMusicBot.user).isEqualTo(newTestUser)
         expectThat(JMusicBot.authToken).isEqualTo(authToken)
         // auth expired
         JMusicBot.stateMachine.transition(Event.AuthExpired)

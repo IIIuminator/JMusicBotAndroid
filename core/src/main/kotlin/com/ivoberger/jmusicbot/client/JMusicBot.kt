@@ -63,8 +63,6 @@ object JMusicBot {
     val state: State
         get() = stateMachine.state
     val stateBroadcast: BroadcastChannel<State> = ConflatedBroadcastChannel(State.Disconnected)
-    val isConnected: Boolean
-        get() = state.isConnected
 
     internal val mBaseComponent: BaseComponent = DaggerBaseComponent.builder()
         .baseModule(BaseModule(HttpLoggingInterceptor.Level.BASIC)).build()
@@ -144,7 +142,7 @@ object JMusicBot {
         }
         try {
             login(authUser)
-            if (tokenValid(authUser, token)) return@withContext
+            if (tokenValid(authUser, authToken!!)) return@withContext
         } catch (e: Exception) {
             Timber.warn(e) { e.message ?: "" }
             Timber.debug { "Authorization failed" }
