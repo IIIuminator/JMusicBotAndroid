@@ -8,6 +8,7 @@ import com.ivoberger.jmusicbot.client.model.AuthExpectation
 import com.ivoberger.jmusicbot.client.model.AuthExpectationJsonAdapter
 import com.ivoberger.jmusicbot.client.model.AuthType
 import com.ivoberger.jmusicbot.client.model.Event
+import com.ivoberger.jmusicbot.client.model.User
 import com.ivoberger.jmusicbot.client.testUtils.enterAuthRequiredState
 import com.ivoberger.jmusicbot.client.testUtils.existingTestUser
 import com.ivoberger.jmusicbot.client.testUtils.newTestUser
@@ -72,7 +73,7 @@ internal class AuthTest {
         val token = newTestUser.toToken()
         mMockServer.enqueue(MockResponse().setResponseCode(201).setBody(token))
         JMusicBot.authorize(newTestUser)
-        checkRegisterRequest()
+        checkForRegisterRequest()
         checkForAuthSuccess(token)
     }
 
@@ -80,6 +81,7 @@ internal class AuthTest {
     fun usernameTakenRegister() = runBlocking {
         mMockServer.enqueue(MockResponse().setResponseCode(409))
         expectThrows<UsernameTakenException> { JMusicBot.authorize(newTestUser) }
+        checkForRegisterRequest()
         checkForAuthFailure()
     }
 
@@ -97,6 +99,7 @@ internal class AuthTest {
         mMockServer.enqueue(MockResponse().setBody(token))
         mMockServer.enqueue(MockResponse().setResponseCode(200).setBody(msg))
         JMusicBot.authorize(existingTestUser)
+        checkForLoginSequence(existingTestUser, token)
         checkForAuthSuccess(token)
     }
 
@@ -106,6 +109,8 @@ internal class AuthTest {
         mMockServer.enqueue(MockResponse().setResponseCode(404))
         expectThrows<NotFoundException> { JMusicBot.authorize(existingTestUser) }
             .get { type }.isEqualTo(NotFoundException.Type.USER)
+        checkForRegisterRequest()
+        checkForLoginRequest(existingTestUser)
         checkForAuthFailure()
     }
 
@@ -119,6 +124,8 @@ internal class AuthTest {
             get { AuthExpectationJsonAdapter(JMusicBot.mBaseComponent.moshi).fromJson(message!!) }
                 .isEqualTo(AuthExpectation(AuthType.BASIC, "Full", null))
         }
+        checkForRegisterRequest()
+        checkForLoginRequest(existingTestUser)
         checkForAuthFailure()
     }
 
@@ -128,27 +135,34 @@ internal class AuthTest {
         val token = newTestUser.toToken()
         mMockServer.enqueue(MockResponse().setResponseCode(200).setBody(msg))
         JMusicBot.authorize(newTestUser, Auth.Token(token))
+        checkForTokenValidityRequest(token)
         checkForAuthSuccess(token)
     }
 
     @Test
     fun authorizeWithWrongUsersToken() = runBlocking {
         val msg = """{ "name": "Wroooong", "permissions" : ["enqueue"] }"""
+        val token = newTestUser.toToken()
         mMockServer.enqueue(MockResponse().setResponseCode(200).setBody(msg))
         mMockServer.enqueue(MockResponse().setResponseCode(409))
         expectThrows<UsernameTakenException> {
-            JMusicBot.authorize(newTestUser, Auth.Token(newTestUser.toToken()))
+            JMusicBot.authorize(newTestUser, Auth.Token(token))
         }
+        checkForTokenValidityRequest(token)
+        checkForRegisterRequest()
         checkForAuthFailure()
     }
 
     @Test
     fun authorizeWithInvalidToken() = runBlocking {
+        val token = newTestUser.toToken()
         mMockServer.enqueue(MockResponse().setResponseCode(401).setBody("Invalid token"))
         mMockServer.enqueue(MockResponse().setResponseCode(409))
         expectThrows<UsernameTakenException> {
-            JMusicBot.authorize(newTestUser, Auth.Token(newTestUser.toToken()))
+            JMusicBot.authorize(newTestUser, Auth.Token(token))
         }
+        checkForTokenValidityRequest(token)
+        checkForRegisterRequest()
         checkForAuthFailure()
     }
 
@@ -158,6 +172,7 @@ internal class AuthTest {
         expectThrows<UsernameTakenException> {
             JMusicBot.authorize(newTestUser, Auth.Token(newTestUser.toExpiredToken()))
         }
+        checkForRegisterRequest()
         checkForAuthFailure()
     }
 
@@ -176,9 +191,28 @@ internal class AuthTest {
         that(JMusicBot.state.hasServer).isTrue()
     }
 
-    private fun checkRegisterRequest() = expectThat(mMockServer.takeRequest()).and {
+    private fun checkForRegisterRequest() = expectThat(mMockServer.takeRequest()).and {
         get { path }.isEqualTo("/user")
         get { method }.isEqualTo("POST")
         get { getHeader(KEY_AUTHORIZATION) }.isNull()
+    }
+
+    private fun checkForTokenValidityRequest(token: String) =
+        expectThat(mMockServer.takeRequest()).and {
+            get { path }.isEqualTo("/user")
+            get { method }.isEqualTo("GET")
+            get { getHeader(KEY_AUTHORIZATION) }.isEqualTo(Auth.Token(token).toAuthHeader())
+        }
+
+    private fun checkForLoginRequest(user: User) = expectThat(mMockServer.takeRequest()).and {
+        get { path }.isEqualTo("/token")
+        get { method }.isEqualTo("GET")
+        get { getHeader(KEY_AUTHORIZATION) }.isEqualTo(Auth.Basic(user).toAuthHeader())
+    }
+
+    private fun checkForLoginSequence(user: User, token: String) {
+        checkForRegisterRequest()
+        checkForLoginRequest(user)
+        checkForTokenValidityRequest(token)
     }
 }
