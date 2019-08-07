@@ -9,6 +9,7 @@ import com.ivoberger.jmusicbot.client.model.AuthExpectationJsonAdapter
 import com.ivoberger.jmusicbot.client.model.AuthType
 import com.ivoberger.jmusicbot.client.model.Event
 import com.ivoberger.jmusicbot.client.model.User
+import com.ivoberger.jmusicbot.client.testUtils.PrintTree
 import com.ivoberger.jmusicbot.client.testUtils.enterAuthRequiredState
 import com.ivoberger.jmusicbot.client.testUtils.existingTestUser
 import com.ivoberger.jmusicbot.client.testUtils.newTestUser

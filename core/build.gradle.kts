@@ -34,7 +34,6 @@ dependencies {
     implementation(Libs.okhttp)
     implementation(Libs.logging_interceptor)
     implementation(Libs.retrofit)
-    implementation(Libs.retrofit2_kotlin_coroutines_adapter)
     implementation(Libs.converter_moshi)
     implementation(Libs.moshi)
     kapt(Libs.moshi_kotlin_codegen)

@@ -17,6 +17,10 @@ object Libs {
 
     /**
      * https://developer.android.com/studio */
+    const val aapt2: String = "com.android.tools.build:aapt2:" + Versions.aapt2
+
+    /**
+     * https://developer.android.com/studio */
     const val com_android_tools_build_gradle: String = "com.android.tools.build:gradle:" +
             Versions.com_android_tools_build_gradle
 
@@ -50,12 +54,6 @@ object Libs {
     /**
      * https://github.com/google/dagger */
     const val dagger: String = "com.google.dagger:dagger:" + Versions.com_google_dagger
-
-    /**
-     * https://github.com/JakeWharton/retrofit2-kotlin-coroutines-adapter/ */
-    const val retrofit2_kotlin_coroutines_adapter: String =
-            "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:" +
-            Versions.retrofit2_kotlin_coroutines_adapter
 
     const val timber_jdk: String = "com.jakewharton.timber:timber-jdk:" + Versions.timber_jdk
 

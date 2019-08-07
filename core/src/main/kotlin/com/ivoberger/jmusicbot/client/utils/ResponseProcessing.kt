@@ -15,14 +15,11 @@
 */
 package com.ivoberger.jmusicbot.client.utils
 
-import com.ivoberger.jmusicbot.client.JMusicBot
 import com.ivoberger.jmusicbot.client.exceptions.AuthException
 import com.ivoberger.jmusicbot.client.exceptions.InvalidParametersException
 import com.ivoberger.jmusicbot.client.exceptions.NotFoundException
 import com.ivoberger.jmusicbot.client.exceptions.ServerErrorException
 import com.ivoberger.jmusicbot.client.exceptions.UsernameTakenException
-import com.ivoberger.jmusicbot.client.model.Event
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import retrofit2.Response
 import timber.log.Timber
@@ -35,32 +32,25 @@ import timber.log.error
     NotFoundException::class,
     ServerErrorException::class
 )
-internal suspend inline fun <reified T> Deferred<Response<T>>.process(
+internal inline fun <reified T> Response<T>.process(
     successCodes: List<Int> = listOf(200, 201, 204),
     errorCodes: Map<Int, Exception> = mapOf(),
     notFoundType: NotFoundException.Type = NotFoundException.Type.SONG,
     invalidParamsType: InvalidParametersException.Type = InvalidParametersException.Type.MISSING
 ): T? {
-    val response: Response<T>
-    try {
-        response = await()
-    } catch (e: Exception) {
-        JMusicBot.stateMachine.transition(Event.Disconnect(e))
-        throw e
-    }
-    return when (response.code()) {
-        in successCodes -> response.body()
-        in errorCodes -> throw errorCodes.getValue(response.code())
-        400 -> throw InvalidParametersException(invalidParamsType, response.errorBody()!!.string())
-        401 -> throw AuthException(AuthException.Reason.NEEDS_AUTH, response.errorBody()!!.string())
+    return when (code()) {
+        in successCodes -> body()
+        in errorCodes -> throw errorCodes.getValue(code())
+        400 -> throw InvalidParametersException(invalidParamsType, errorBody()!!.string())
+        401 -> throw AuthException(AuthException.Reason.NEEDS_AUTH, errorBody()!!.string())
         403 -> throw AuthException(
-            AuthException.Reason.NEEDS_PERMISSION, response.errorBody()!!.string()
+            AuthException.Reason.NEEDS_PERMISSION, errorBody()!!.string()
         )
-        404 -> throw NotFoundException(notFoundType, response.errorBody()!!.string())
+        404 -> throw NotFoundException(notFoundType, errorBody()!!.string())
         409 -> throw UsernameTakenException()
         else -> {
-            Timber.error { "Server Error: ${response.errorBody()?.string()}, ${response.code()}" }
-            throw ServerErrorException(response.code())
+            Timber.error { "Server Error: ${errorBody()?.string()}, ${code()}" }
+            throw ServerErrorException(code())
         }
     }
 }

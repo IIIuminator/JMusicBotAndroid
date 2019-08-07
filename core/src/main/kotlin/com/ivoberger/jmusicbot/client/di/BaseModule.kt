@@ -15,7 +15,6 @@
 */
 package com.ivoberger.jmusicbot.client.di
 
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -23,8 +22,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import timber.log.Timber
-import timber.log.verbose
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
@@ -38,9 +35,7 @@ internal class BaseModule(private val logLevel: HttpLoggingInterceptor.Level = H
 
     @Provides
     fun okHttpClient(): OkHttpClient.Builder = OkHttpClient.Builder().cache(null).addInterceptor(
-        HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { msg ->
-            Timber.tagged("BotSDKNetworking").verbose { msg }
-        }).setLevel(logLevel)
+        HttpLoggingInterceptor().apply { level = logLevel }
     ).retryOnConnectionFailure(true).connectTimeout(30, TimeUnit.SECONDS)
 
     @Provides
@@ -49,5 +44,4 @@ internal class BaseModule(private val logLevel: HttpLoggingInterceptor.Level = H
         Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
             .client(okHttpClientBuilder.build())
-            .addCallAdapterFactory(CoroutineCallAdapterFactory())
 }

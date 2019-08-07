@@ -37,7 +37,7 @@ class TokenAuthenticator : Authenticator {
         runBlocking(Dispatchers.IO) {
             Timber.debug { "Re-authorizing" }
             var auth: String? = null
-            response.body()?.let { body ->
+            response.body?.let { body ->
                 val authExpectation =
                     JMusicBot.mBaseComponent.moshi.adapter(AuthExpectation::class.java)
                         .fromJson(String(body.bytes()))
@@ -58,7 +58,7 @@ class TokenAuthenticator : Authenticator {
                     else -> null
                 }
             }
-            val origRequest = response.request()
+            val origRequest = response.request
 
             return@runBlocking if (origRequest.header(KEY_AUTHORIZATION) == auth) null else origRequest.newBuilder()
                 .header(KEY_AUTHORIZATION, auth ?: "")

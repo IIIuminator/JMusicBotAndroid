@@ -29,7 +29,6 @@ import com.ivoberger.jmusicbot.client.model.QueueEntry
 import com.ivoberger.jmusicbot.client.model.Song
 import com.ivoberger.jmusicbot.client.model.UserInfo
 import com.ivoberger.jmusicbot.client.model.VersionInfo
-import kotlinx.coroutines.Deferred
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -51,103 +50,103 @@ internal interface MusicBotService {
 
     // User operations
     @PUT(URL_USER)
-    fun changePassword(@Body newPassword: Auth.PasswordChange): Deferred<Response<String>>
+    suspend fun changePassword(@Body newPassword: Auth.PasswordChange): Response<String>
 
     @DELETE(URL_USER)
-    fun deleteUser(): Deferred<Response<Unit>>
+    suspend fun deleteUser(): Response<Unit>
 
     @POST(URL_USER)
-    fun registerUser(@Body credentials: Auth.Register): Deferred<Response<String>>
+    suspend fun registerUser(@Body credentials: Auth.Register): Response<String>
 
     @GET("token")
-    fun loginUser(@Header(KEY_AUTHORIZATION) loginCredentials: String): Deferred<Response<String>>
+    suspend fun loginUser(@Header(KEY_AUTHORIZATION) loginCredentials: String): Response<String>
 
     @GET(URL_USER)
-    fun testToken(
+    suspend fun testToken(
         @Header(KEY_AUTHORIZATION) authToken: String
-    ): Deferred<Response<UserInfo>>
+    ): Response<UserInfo>
 
     // Song operations
 
     @GET("$URL_PROVIDER/{$KEY_PROVIDER_ID}/{$KEY_SONG_ID}")
-    fun lookupSong(
+    suspend fun lookupSong(
         @Path(KEY_PROVIDER_ID) providerId: String,
         @Path(KEY_SONG_ID) songId: String
-    ): Deferred<Response<Song>>
+    ): Response<Song>
 
     @GET("$URL_PROVIDER/{$KEY_PROVIDER_ID}")
-    fun searchForSong(
+    suspend fun searchForSong(
         @Path(KEY_PROVIDER_ID) providerId: String,
         @Query(KEY_QUERY) query: String
-    ): Deferred<Response<List<Song>>>
+    ): Response<List<Song>>
 
     // Queue operations
 
     @DELETE("$URL_PLAYER/$URL_QUEUE")
-    fun dequeue(@Query(KEY_SONG_ID) songId: String, @Query(KEY_PROVIDER_ID) providerId: String): Deferred<Response<List<QueueEntry>>>
+    suspend fun dequeue(@Query(KEY_SONG_ID) songId: String, @Query(KEY_PROVIDER_ID) providerId: String): Response<List<QueueEntry>>
 
     @PUT("$URL_PLAYER/$URL_QUEUE")
-    fun enqueue(@Query(KEY_SONG_ID) songId: String, @Query(KEY_PROVIDER_ID) providerId: String): Deferred<Response<List<QueueEntry>>>
+    suspend fun enqueue(@Query(KEY_SONG_ID) songId: String, @Query(KEY_PROVIDER_ID) providerId: String): Response<List<QueueEntry>>
 
     @PUT("$URL_PLAYER/$URL_QUEUE/order")
-    fun moveEntry(
+    suspend fun moveEntry(
         @Body entry: QueueEntry,
         @Query("providerId") providerId: String,
         @Query("songId") songId: String,
         @Query("index") index: Int
-    ): Deferred<Response<List<QueueEntry>>>
+    ): Response<List<QueueEntry>>
 
     @GET("$URL_PLAYER/$URL_QUEUE")
-    fun getQueue(): Deferred<Response<List<QueueEntry>>>
+    suspend fun getQueue(): Response<List<QueueEntry>>
 
     @GET("$URL_PLAYER/$URL_QUEUE/history")
-    fun getHistory(): Deferred<Response<List<QueueEntry>>>
+    suspend fun getHistory(): Response<List<QueueEntry>>
 
     // Suggest operations
 
     @GET(URL_SUGGEST)
-    fun getSuggesters(): Deferred<Response<List<MusicBotPlugin>>>
+    suspend fun getSuggesters(): Response<List<MusicBotPlugin>>
 
     @DELETE("$URL_SUGGEST/{$KEY_SUGGESTER_ID}")
-    fun deleteSuggestion(
+    suspend fun deleteSuggestion(
         @Path(KEY_SUGGESTER_ID) suggesterId: String,
         @Query(KEY_SONG_ID) songId: String,
         @Query(KEY_PROVIDER_ID) providerId: String
-    ): Deferred<Response<Unit>>
+    ): Response<Unit>
 
     @GET("$URL_SUGGEST/{$KEY_SUGGESTER_ID}")
-    fun getSuggestions(@Path(KEY_SUGGESTER_ID) suggesterId: String, @Query("max") limit: Int = 32): Deferred<Response<List<Song>>>
+    suspend fun getSuggestions(@Path(KEY_SUGGESTER_ID) suggesterId: String, @Query("max") limit: Int = 32): Response<List<Song>>
 
     // Provider operations
 
     @GET(URL_PROVIDER)
-    fun getProvider(): Deferred<Response<List<MusicBotPlugin>>>
+    suspend fun getProvider(): Response<List<MusicBotPlugin>>
 
     // Player operations
 
     @GET(URL_PLAYER)
-    fun getPlayerState(): Deferred<Response<PlayerState>>
+    suspend fun getPlayerState(): Response<PlayerState>
 
 //    @PUT(URL_PLAYER)
-//    fun setPlayerState(@Body playerStateChange: PlayerStateChange): Deferred<Response<PlayerState>>
+//    suspend fun setPlayerState(@Body playerStateChange: PlayerStateChange): Response<PlayerState>
 
     @PUT(URL_PLAYER)
-    fun pause(
+    suspend fun pause(
         @Body playerStateChange: PlayerStateChange = PlayerStateChange(
             PlayerAction.PAUSE
         )
-    ): Deferred<Response<PlayerState>>
+    ): Response<PlayerState>
 
     @PUT(URL_PLAYER)
-    fun play(
+    suspend fun play(
         @Body playerStateChange: PlayerStateChange = PlayerStateChange(PlayerAction.PLAY)
-    ): Deferred<Response<PlayerState>>
+    ): Response<PlayerState>
 
     @PUT(URL_PLAYER)
-    fun skip(
+    suspend fun skip(
         @Body playerStateChange: PlayerStateChange = PlayerStateChange(PlayerAction.SKIP)
-    ): Deferred<Response<PlayerState>>
+    ): Response<PlayerState>
 
     @GET("version")
-    fun getVersionInfo(): Deferred<Response<VersionInfo>>
+    suspend fun getVersionInfo(): Response<VersionInfo>
 }

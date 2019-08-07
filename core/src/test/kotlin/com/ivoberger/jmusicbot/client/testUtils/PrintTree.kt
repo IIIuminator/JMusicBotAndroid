@@ -1,4 +1,4 @@
-package com.ivoberger.jmusicbot.client
+package com.ivoberger.jmusicbot.client.testUtils
 
 import timber.log.Timber
 import timber.log.Tree
