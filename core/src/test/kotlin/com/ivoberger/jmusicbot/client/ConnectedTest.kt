@@ -7,6 +7,8 @@ import com.ivoberger.jmusicbot.client.testUtils.enterConnectedState
 import com.ivoberger.jmusicbot.client.testUtils.newTestUser
 import com.ivoberger.jmusicbot.client.testUtils.toToken
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
+import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
@@ -60,7 +62,12 @@ internal class ConnectedTest {
     }
 
     @Test
-    fun queueUpdates() {
+    fun queueUpdates() = runBlocking {
+        
+        mMockServer.enqueue(MockResponse().setBody(""))
+        for (queue in JMusicBot.getQueue().openSubscription()) {
+
+        }
     }
 
     @Test
