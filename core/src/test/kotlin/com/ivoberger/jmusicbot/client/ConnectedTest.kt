@@ -10,7 +10,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,18 +37,20 @@ internal class ConnectedTest {
         }
     }
 
+    private lateinit var authToken: Auth.Token
+
     @BeforeEach
     fun testSetUp() {
         mMockServer = MockWebServer()
         mBaseUrl = mMockServer.hostName
         mPort = mMockServer.port
-        val token = Auth.Token(newTestUser.toToken())
+        authToken = Auth.Token(newTestUser.toToken())
         JMusicBot.stateMachine.enterConnectedState(
-            Event.ServerFound(mBaseUrl, mPort), Event.Authorize(newTestUser, token)
+            Event.ServerFound(mBaseUrl, mPort), Event.Authorize(newTestUser, authToken)
         )
-        Assertions.assertEquals("http://$mBaseUrl:$mPort/", JMusicBot.baseUrl)
-        Assertions.assertEquals(newTestUser, JMusicBot.user)
-        Assertions.assertEquals(token, JMusicBot.authToken)
+        assertEquals("http://$mBaseUrl:$mPort/", JMusicBot.baseUrl)
+        assertEquals(newTestUser, JMusicBot.user)
+        assertEquals(authToken, JMusicBot.authToken)
     }
 
     @AfterEach

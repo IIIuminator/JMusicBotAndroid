@@ -16,6 +16,7 @@
 package com.ivoberger.jmusicbot.client.android
 
 import com.ivoberger.jmusicbot.client.JMusicBot
+import com.ivoberger.jmusicbot.client.utils.DEFAULT_PORT
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
@@ -24,10 +25,14 @@ import splitties.systemservices.wifiManager
 private const val LOCK_TAG = "enq_broadcast"
 
 @ExperimentalCoroutinesApi
-suspend fun JMusicBot.discoverHostAndroid(knownHost: String? = null) = withContext(Dispatchers.IO) {
-    val lock = wifiManager?.createMulticastLock(LOCK_TAG)
-    if (lock?.isHeld != false) return@withContext
-    lock.acquire()
-    discoverHost(knownHost)
-    lock.release()
-}
+suspend fun JMusicBot.discoverHostWithMulticastLock(
+    knownHost: String? = null,
+    port: Int = DEFAULT_PORT
+) =
+    withContext(Dispatchers.IO) {
+        val lock = wifiManager?.createMulticastLock(LOCK_TAG)
+        if (lock?.isHeld != false) return@withContext
+        lock.acquire()
+        discoverHost(knownHost, port)
+        lock.release()
+    }

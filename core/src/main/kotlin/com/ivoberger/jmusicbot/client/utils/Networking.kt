@@ -11,7 +11,7 @@ import java.net.InetAddress
 import java.net.MulticastSocket
 
 private const val GROUP_ADDRESS = "224.0.0.142"
-internal const val DEFAULT_PORT = 42945
+const val DEFAULT_PORT = 42945
 private const val SOCKET_TIMEOUT = 4000
 
 internal fun listenForServerMulticast(port: Int): String? {

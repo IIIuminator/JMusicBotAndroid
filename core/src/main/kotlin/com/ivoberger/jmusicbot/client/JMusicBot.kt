@@ -62,7 +62,7 @@ object JMusicBot {
 
     val state: State
         get() = stateMachine.state
-    val stateBroadcast: BroadcastChannel<State> = ConflatedBroadcastChannel(State.Disconnected)
+    val stateBroadcast: BroadcastChannel<State> = ConflatedBroadcastChannel(state)
 
     internal val mBaseComponent: BaseComponent = DaggerBaseComponent.builder()
         .baseModule(BaseModule(HttpLoggingInterceptor.Level.BASIC)).build()
