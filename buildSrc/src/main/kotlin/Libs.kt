@@ -91,25 +91,12 @@ object Libs {
 
     /**
      * https://github.com/square/retrofit/ */
-    const val retrofit_mock: String = "com.squareup.retrofit2:retrofit-mock:" +
-            Versions.com_squareup_retrofit2
-
-    /**
-     * https://github.com/square/retrofit/ */
     const val retrofit: String = "com.squareup.retrofit2:retrofit:" +
             Versions.com_squareup_retrofit2
 
     const val de_fayard_buildsrcversions_gradle_plugin: String =
             "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +
             Versions.de_fayard_buildsrcversions_gradle_plugin
-
-    /**
-     * http://mockk.io */
-    const val mockk: String = "io.mockk:mockk:" + Versions.mockk
-
-    /**
-     * https://strikt.io/ */
-    const val strikt_core: String = "io.strikt:strikt-core:" + Versions.strikt_core
 
     /**
      * https://kotlinlang.org/ */

@@ -10,10 +10,9 @@ import com.ivoberger.jmusicbot.client.testUtils.newTestUser
 import com.ivoberger.jmusicbot.client.testUtils.toToken
 import com.ivoberger.jmusicbot.client.utils.DEFAULT_PORT
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import strikt.api.expectThat
-import strikt.assertions.isEqualTo
 
 @ExperimentalCoroutinesApi
 internal class StateMachineTest {
@@ -43,10 +42,10 @@ internal class StateMachineTest {
 
     @Test
     fun initialState() {
-        expectThat(state).isEqualTo(State.Disconnected)
+        assertEquals(State.Disconnected, state)
         checkTransitions(listOf(Event.StartDiscovery), State.Disconnected)
         JMusicBot.stateMachine.transition(Event.StartDiscovery)
-        expectThat(state).isEqualTo(State.Discovering)
+        assertEquals(State.Discovering, state)
     }
 
     @Test
@@ -55,47 +54,47 @@ internal class StateMachineTest {
         checkTransitions(listOf(serverFoundEvent, Event.Disconnect()), State.Discovering)
         // server found
         JMusicBot.stateMachine.transition(serverFoundEvent)
-        expectThat(state).isEqualTo(State.AuthRequired)
+        assertEquals(State.AuthRequired, state)
         // reset
         setUp()
         // disconnected
         JMusicBot.stateMachine.enterDiscoveringState()
         JMusicBot.stateMachine.transition(Event.Disconnect())
-        expectThat(state).isEqualTo(State.Disconnected)
+        assertEquals(State.Disconnected, state)
     }
 
     @Test
     fun authRequiredState() {
         JMusicBot.stateMachine.enterAuthRequiredState(serverFoundEvent)
         checkTransitions(listOf(authorizeEvent, Event.Disconnect()), State.AuthRequired)
-        expectThat(JMusicBot.baseUrl).isEqualTo(baseUrl)
+        assertEquals(baseUrl, JMusicBot.baseUrl)
         // authorize
         JMusicBot.stateMachine.transition(authorizeEvent)
-        expectThat(state).isEqualTo(State.Connected)
+        assertEquals(State.Connected, state)
         // reset
         setUp()
         // disconnected
         JMusicBot.stateMachine.enterAuthRequiredState(serverFoundEvent)
         JMusicBot.stateMachine.transition(Event.Disconnect())
-        expectThat(state).isEqualTo(State.Disconnected)
+        assertEquals(State.Disconnected, state)
     }
 
     @Test
     fun connectedState() {
         JMusicBot.stateMachine.enterConnectedState(serverFoundEvent, authorizeEvent)
         checkTransitions(listOf(Event.AuthExpired, Event.Disconnect()), State.Connected)
-        expectThat(JMusicBot.baseUrl).isEqualTo(baseUrl)
-        expectThat(JMusicBot.user).isEqualTo(newTestUser)
-        expectThat(JMusicBot.authToken).isEqualTo(authToken)
+        assertEquals(baseUrl, JMusicBot.baseUrl)
+        assertEquals(newTestUser, JMusicBot.user)
+        assertEquals(authToken, JMusicBot.authToken)
         // auth expired
         JMusicBot.stateMachine.transition(Event.AuthExpired)
-        expectThat(state).isEqualTo(State.AuthRequired)
+        assertEquals(State.AuthRequired, state)
         // reset
         setUp()
         // disconnected
         JMusicBot.stateMachine.enterConnectedState(serverFoundEvent, authorizeEvent)
         JMusicBot.stateMachine.transition(Event.Disconnect())
-        expectThat(state).isEqualTo(State.Disconnected)
+        assertEquals(State.Disconnected, state)
     }
 
     private fun checkTransitions(validEvents: List<Event>, currentState: State) =
@@ -103,7 +102,7 @@ internal class StateMachineTest {
             // filter event causing an actual transition
             if (!validEvents.contains(event) && !validEvents.any { it::class != event::class }) {
                 JMusicBot.stateMachine.transition(event)
-                expectThat(state).isEqualTo(currentState)
+                assertEquals(currentState, state)
             }
         }
 }

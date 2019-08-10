@@ -40,9 +40,6 @@ dependencies {
 
     testImplementation(Libs.junit_jupiter)
     testImplementation(Libs.kotlinx_coroutines_test)
-    testImplementation(Libs.strikt_core)
-    testImplementation(Libs.mockk)
-    testImplementation(Libs.retrofit_mock)
     testImplementation(Libs.mockwebserver)
     testImplementation(Libs.koda_time)
 }
