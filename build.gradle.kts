@@ -29,6 +29,7 @@ allprojects {
 spotless {
     kotlin {
         target("**/kotlin/**/*.kt")
+        targetExclude("buildSrc/**")
         ktlint()
         licenseHeaderFile("licenseHeader.txt")
     }
