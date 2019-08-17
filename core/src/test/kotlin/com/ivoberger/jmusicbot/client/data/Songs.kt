@@ -19,7 +19,7 @@ import com.ivoberger.jmusicbot.client.model.Song
 
 object Songs {
     val californication = Song(
-        "1",
+        "1-gplaymusic",
         "Californication",
         "Red Hot Chili Peppers",
         null,
@@ -27,7 +27,7 @@ object Songs {
         Provider.gplaymusic
     )
     val nothingElseMatters = Song(
-        "2",
+        "2-gplaymusic",
         "Nothing Else Matters",
         "Metallica",
         null,
@@ -35,11 +35,19 @@ object Songs {
         Provider.gplaymusic
     )
     val stairwayToHeaven = Song(
-        "3",
+        "3-gplaymusic",
         "Stairway To Heaven",
         "Led Zeppelin",
         null,
         240,
         Provider.gplaymusic
+    )
+    val smokeOnTheWater = Song(
+        "1-spotify",
+        "Smoke On The Water",
+        "Deep Purple",
+        null,
+        196,
+        Provider.spotify
     )
 }

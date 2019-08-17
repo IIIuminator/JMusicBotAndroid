@@ -21,10 +21,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 object Queues {
-    val filled = listOf(
+    val full = listOf(
         QueueEntry(Songs.californication, newTestUser.name),
         QueueEntry(Songs.nothingElseMatters, newTestUser.name),
-        QueueEntry(Songs.stairwayToHeaven, newTestUser.name)
+        QueueEntry(Songs.stairwayToHeaven, newTestUser.name),
+        QueueEntry(Songs.smokeOnTheWater, newTestUser.name)
     )
+    val halfFull = full.slice(2..3)
     val empty = listOf<QueueEntry>()
 }

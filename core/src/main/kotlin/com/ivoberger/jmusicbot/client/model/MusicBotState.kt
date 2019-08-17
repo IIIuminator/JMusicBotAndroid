@@ -62,13 +62,11 @@ internal fun JMusicBot.makeStateMachine(): StateMachine<State, Event, SideEffect
                         mServiceClient = mUserSession!!.musicBotService()
                         connectionListeners.forEach { it.onConnectionRecovered() }
                     }
-                    SideEffect.EndUserSession -> {
-                        mUserSession = null
-                        mServiceClient = mServerSession!!.musicBotService()
-                    }
+                    SideEffect.EndUserSession -> endUserSession()
                     SideEffect.EndServerSession -> {
-                        mUserSession = null
+                        endUserSession()
                         mServerSession = null
+                        mServiceClient = null
                         if (trans.fromState is State.Discovering) return@onTransition
                         val event = trans.event as Event.Disconnect
                         connectionListeners.forEach { it.onConnectionLost(event.reason) }
@@ -81,6 +79,13 @@ internal fun JMusicBot.makeStateMachine(): StateMachine<State, Event, SideEffect
             invalidTransition?.let { Timber.debug { "Attempted state transition from ${it.fromState} by ${it.event}" } }
         }
     }
+
+internal fun JMusicBot.endUserSession() {
+    stopPlayerUpdates()
+    stopQueueUpdates()
+    mUserSession = null
+    mServiceClient = mServerSession?.musicBotService()
+}
 
 /**
  * Possible states for the musicBotService bot jmusicbot.jmusicbot.client to be in

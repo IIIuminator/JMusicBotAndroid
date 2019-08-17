@@ -348,7 +348,7 @@ object JMusicBot {
         try {
             state.connectionCheck()
             val queue = newQueue ?: mServiceClient!!.getQueue().process() ?: listOf()
-            withContext(Dispatchers.Main) { mQueue.send(queue) }
+            mQueue.send(queue)
         } catch (e: Exception) {
             Timber.warn(e) { "Queue update failed" }
         }
@@ -360,7 +360,7 @@ object JMusicBot {
             state.connectionCheck()
             val state = playerState ?: mServiceClient!!.getPlayerState().process()
             ?: PlayerState(PlayerStates.ERROR)
-            withContext(Dispatchers.Main) { mPlayerState.send(state) }
+            mPlayerState.send(state)
         } catch (e: Exception) {
             Timber.warn(e) { "Player state update failed" }
         }

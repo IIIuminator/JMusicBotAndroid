@@ -20,6 +20,7 @@ import java.lang.reflect.Type
 
 sealed class MoshiTypes {
     companion object {
+        val Queue: Type = Types.newParameterizedType(List::class.java, QueueEntry::class.java)
         val SongList: Type = Types.newParameterizedType(List::class.java, Song::class.java)
         val UserList: Type = Types.newParameterizedType(List::class.java, User::class.java)
     }

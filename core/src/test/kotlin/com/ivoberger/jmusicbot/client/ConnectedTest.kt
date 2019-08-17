@@ -15,12 +15,18 @@
 */
 package com.ivoberger.jmusicbot.client
 
+import com.ivoberger.jmusicbot.client.data.PlayerStates
+import com.ivoberger.jmusicbot.client.data.Queues
 import com.ivoberger.jmusicbot.client.model.Auth
 import com.ivoberger.jmusicbot.client.model.Event
+import com.ivoberger.jmusicbot.client.model.MoshiTypes
+import com.ivoberger.jmusicbot.client.model.PlayerState
+import com.ivoberger.jmusicbot.client.model.QueueEntry
 import com.ivoberger.jmusicbot.client.testUtils.PrintTree
 import com.ivoberger.jmusicbot.client.testUtils.enterConnectedState
 import com.ivoberger.jmusicbot.client.testUtils.newTestUser
 import com.ivoberger.jmusicbot.client.testUtils.toToken
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -55,6 +61,9 @@ internal class ConnectedTest {
     }
 
     private lateinit var authToken: Auth.Token
+    private val mMoshi = Moshi.Builder().build()
+    private val mQueueAdapter = mMoshi.adapter<List<QueueEntry>>(MoshiTypes.Queue)
+    private val mPlayerStateAdapter = mMoshi.adapter(PlayerState::class.java)
 
     @BeforeEach
     fun testSetUp() {
@@ -77,14 +86,32 @@ internal class ConnectedTest {
     }
 
     @Test
-    fun queueUpdates() = runBlocking {
+    fun queueUpdates() {
+        mMockServer.enqueue(MockResponse().setBody(mQueueAdapter.toJson(Queues.full)))
+        mMockServer.enqueue(MockResponse().setBody("invalid JSON"))
+        mMockServer.enqueue(MockResponse().setBody(mQueueAdapter.toJson(Queues.halfFull)))
+        mMockServer.enqueue(MockResponse().setBody("[]"))
 
-        mMockServer.enqueue(MockResponse().setBody(""))
-        for (queue in JMusicBot.getQueue().openSubscription()) {
+        runBlocking {
+            val queueUpdates = JMusicBot.getQueue().openSubscription()
+            assertEquals(Queues.full, queueUpdates.receive())
+            assertEquals(Queues.halfFull, queueUpdates.receive())
+            assertEquals(Queues.empty, queueUpdates.receive())
         }
     }
 
     @Test
     fun playerUpdates() {
+        mMockServer.enqueue(MockResponse().setBody(mPlayerStateAdapter.toJson(PlayerStates.playingCaliforniacation)))
+        mMockServer.enqueue(MockResponse().setBody("invalid JSON"))
+        mMockServer.enqueue(MockResponse().setBody(mPlayerStateAdapter.toJson(PlayerStates.stopped)))
+        mMockServer.enqueue(MockResponse().setBody(mPlayerStateAdapter.toJson(PlayerStates.paused)))
+
+        runBlocking {
+            val playerUpdates = JMusicBot.getPlayerState().openSubscription()
+            assertEquals(PlayerStates.playingCaliforniacation, playerUpdates.receive())
+            assertEquals(PlayerStates.stopped, playerUpdates.receive())
+            assertEquals(PlayerStates.paused, playerUpdates.receive())
+        }
     }
 }
