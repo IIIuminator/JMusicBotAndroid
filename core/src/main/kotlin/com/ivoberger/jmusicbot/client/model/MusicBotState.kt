@@ -80,6 +80,7 @@ internal fun JMusicBot.makeStateMachine(): StateMachine<State, Event, SideEffect
         }
     }
 
+@ExperimentalCoroutinesApi
 internal fun JMusicBot.endUserSession() {
     stopPlayerUpdates()
     stopQueueUpdates()
