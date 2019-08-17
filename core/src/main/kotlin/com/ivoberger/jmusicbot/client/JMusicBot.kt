@@ -31,7 +31,6 @@ import com.ivoberger.jmusicbot.client.model.Auth
 import com.ivoberger.jmusicbot.client.model.Event
 import com.ivoberger.jmusicbot.client.model.MusicBotPlugin
 import com.ivoberger.jmusicbot.client.model.PlayerState
-import com.ivoberger.jmusicbot.client.model.PlayerStates
 import com.ivoberger.jmusicbot.client.model.QueueEntry
 import com.ivoberger.jmusicbot.client.model.Song
 import com.ivoberger.jmusicbot.client.model.State
@@ -358,8 +357,7 @@ object JMusicBot {
         if (playerState != null) Timber.debug { "Manual Player Update" }
         try {
             state.connectionCheck()
-            val state = playerState ?: mServiceClient!!.getPlayerState().process()
-            ?: PlayerState(PlayerStates.ERROR)
+            val state = playerState ?: mServiceClient!!.getPlayerState().process()!!
             mPlayerState.send(state)
         } catch (e: Exception) {
             Timber.warn(e) { "Player state update failed" }
