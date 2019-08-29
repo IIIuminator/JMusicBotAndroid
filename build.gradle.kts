@@ -1,3 +1,5 @@
+import de.fayard.BuildSrcVersionsTask
+
 buildscript {
     repositories {
         google()
@@ -11,7 +13,7 @@ buildscript {
 }
 
 plugins {
-    id("de.fayard.buildSrcVersions") version (Versions.de_fayard_buildsrcversions_gradle_plugin)
+    buildSrcVersions
     id("com.diffplug.gradle.spotless") version (Versions.com_diffplug_gradle_spotless_gradle_plugin)
 }
 
@@ -21,7 +23,6 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven(url = "https://jitpack.io")
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
     }
 }
@@ -40,6 +41,12 @@ spotless {
 }
 
 tasks.wrapper {
-    distributionType = Wrapper.DistributionType.BIN
-    version = Versions.gradleLatestVersion
+    distributionType = Wrapper.DistributionType.ALL
+    gradleVersion = Versions.gradleLatestVersion
 }
+
+tasks.named<BuildSrcVersionsTask>("buildSrcVersions") {
+    finalizedBy(tasks.wrapper)
+}
+
+

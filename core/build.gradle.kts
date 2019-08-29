@@ -9,7 +9,6 @@ tasks.jacocoTestReport {
     reports {
         xml.isEnabled = false
         csv.isEnabled = false
-        html.destination = file("$buildDir/jacocoHtml")
     }
 }
 
