@@ -48,5 +48,3 @@ tasks.wrapper {
 tasks.named<BuildSrcVersionsTask>("buildSrcVersions") {
     finalizedBy(tasks.wrapper)
 }
-
-
