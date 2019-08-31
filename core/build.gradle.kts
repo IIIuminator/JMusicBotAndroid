@@ -1,8 +1,13 @@
 plugins {
     kotlin("jvm")
     kotlin("kapt")
-    maven
-    jacoco
+    id("org.jetbrains.dokka")
+    `maven-publish`
+}
+
+tasks.test {
+    useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.jacocoTestReport {
@@ -12,11 +17,20 @@ tasks.jacocoTestReport {
     }
 }
 
-tasks.compileKotlin { kotlinOptions.jvmTarget = "1.8" }
-tasks.compileTestKotlin { kotlinOptions.jvmTarget = "1.8" }
-tasks.test {
-    useJUnitPlatform()
-    finalizedBy(tasks.jacocoTestReport)
+tasks.register<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allSource)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>(name) {
+            from(components["java"])
+
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
+        }
+    }
 }
 
 dependencies {

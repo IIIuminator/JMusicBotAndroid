@@ -1,4 +1,6 @@
 import de.fayard.BuildSrcVersionsTask
+import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
     repositories {
@@ -8,22 +10,59 @@ buildscript {
     dependencies {
         classpath(Libs.com_android_tools_build_gradle)
         classpath(Libs.kotlin_gradle_plugin)
-        classpath(Libs.com_github_dcendents_android_maven_gradle_plugin)
+        classpath(Libs.android_maven_publish)
+        classpath(Libs.dokka_gradle_plugin)
+        classpath(Libs.dokka_android_gradle_plugin)
     }
 }
 
 plugins {
     buildSrcVersions
+    `maven-publish`
     id("com.diffplug.gradle.spotless") version (Versions.com_diffplug_gradle_spotless_gradle_plugin)
 }
 
-allprojects {
+
+subprojects {
     group = "com.ivoberger.jmusicbot-client"
     version = "0.8.4"
+
+    apply(plugin = "org.gradle.jacoco")
+
     repositories {
         google()
         jcenter()
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
+    }
+
+    tasks.withType<KotlinCompile> { kotlinOptions { jvmTarget = "1.8" } }
+
+    afterEvaluate {
+        tasks.named<DokkaTask>("dokka") {
+            outputFormat = "html"
+            outputDirectory = "$buildDir/javadoc"
+        }
+    }
+
+    tasks.register<Jar>("javadocJar") {
+        val dokka = tasks.named<DokkaTask>("dokka")
+        archiveClassifier.set("javadoc")
+        from(dokka.get().outputDirectory)
+        dependsOn(dokka)
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            val githubUsername = System.getenv("GITHUB_USERNAME")
+            name = "github"
+            url = uri("https://maven.pkg.github.com/$githubUsername")
+            credentials {
+                username = githubUsername
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 

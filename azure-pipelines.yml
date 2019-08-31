@@ -21,4 +21,4 @@ steps:
       publishJUnitResults: true
       testResultsFiles: '**/TEST-*.xml'
       codeCoverageToolOption: 'jaCoCo'
-      tasks: 'build'
+      tasks: 'build lint test'

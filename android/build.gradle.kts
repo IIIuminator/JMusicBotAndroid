@@ -3,7 +3,8 @@ plugins {
     kotlin("android")
     kotlin("android.extensions")
     kotlin("kapt")
-    id("com.github.dcendents.android-maven")
+    id("org.jetbrains.dokka-android")
+    id("digital.wup.android-maven-publish")
 }
 
 android {
@@ -14,10 +15,15 @@ android {
     }
 
     sourceSets {
-        getByName("androidTest").java.srcDirs("src/androidTest/kotlin")
-        getByName("debug").java.srcDirs("src/debug/kotlin")
-        getByName("main").java.srcDirs("src/main/kotlin")
-        getByName("test").java.srcDirs("src/test/kotlin")
+        getByName("androidTest").java.srcDir("src/androidTest/kotlin")
+        getByName("debug").java.srcDir("src/debug/kotlin")
+        getByName("main").java.srcDir("src/main/kotlin")
+        getByName("test").java.srcDir("src/test/kotlin")
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     buildTypes {
@@ -27,6 +33,23 @@ android {
         }
     }
     packagingOptions.pickFirst("META-INF/atomicfu.kotlin_module")
+
+}
+
+tasks.register<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(android.sourceSets.getByName("main").java.srcDirs)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>(name) {
+            from(components["android"])
+
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
+        }
+    }
 }
 
 dependencies {

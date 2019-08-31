@@ -21,9 +21,6 @@ object Libs {
      */
     const val aapt2: String = "com.android.tools.build:aapt2:" + Versions.aapt2
 
-    /**
-     * https://developer.android.com/studio
-     */
     const val com_android_tools_build_gradle: String = "com.android.tools.build:gradle:" +
         Versions.com_android_tools_build_gradle
 
@@ -40,10 +37,6 @@ object Libs {
     const val com_diffplug_gradle_spotless_gradle_plugin: String =
         "com.diffplug.gradle.spotless:com.diffplug.gradle.spotless.gradle.plugin:" +
             Versions.com_diffplug_gradle_spotless_gradle_plugin
-
-    const val com_github_dcendents_android_maven_gradle_plugin: String =
-        "com.github.dcendents.android-maven:com.github.dcendents.android-maven.gradle.plugin:" +
-            Versions.com_github_dcendents_android_maven_gradle_plugin
 
     const val koda_time: String = "com.github.debop:koda-time:" + Versions.koda_time
 
@@ -113,6 +106,15 @@ object Libs {
         "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +
             Versions.de_fayard_buildsrcversions_gradle_plugin
 
+    const val android_maven_publish: String = "digital.wup:android-maven-publish:" +
+        Versions.android_maven_publish
+
+    const val dokka_android_gradle_plugin: String =
+        "org.jetbrains.dokka:dokka-android-gradle-plugin:" + Versions.org_jetbrains_dokka
+
+    const val dokka_gradle_plugin: String = "org.jetbrains.dokka:dokka-gradle-plugin:" +
+        Versions.org_jetbrains_dokka
+
     /**
      * https://kotlinlang.org/
      */
@@ -132,9 +134,6 @@ object Libs {
     const val kotlin_annotation_processing_gradle: String =
         "org.jetbrains.kotlin:kotlin-annotation-processing-gradle:" + Versions.org_jetbrains_kotlin
 
-    /**
-     * https://kotlinlang.org/
-     */
     const val kotlin_gradle_plugin: String = "org.jetbrains.kotlin:kotlin-gradle-plugin:" +
         Versions.org_jetbrains_kotlin
 
