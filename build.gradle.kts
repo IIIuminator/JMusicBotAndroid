@@ -24,7 +24,6 @@ plugins {
     id("com.diffplug.gradle.spotless") version (Versions.com_diffplug_gradle_spotless_gradle_plugin)
 }
 
-
 subprojects {
     group = "com.ivoberger.jmusicbot-client"
     version = "0.9.0"

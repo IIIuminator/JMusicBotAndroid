@@ -76,7 +76,7 @@ internal fun JMusicBot.makeStateMachine(): StateMachine<State, Event, SideEffect
                 return@onTransition
             }
             val invalidTransition = transition as? StateMachine.Transition.Invalid
-            invalidTransition?.let { Timber.debug { "Attempted state transition from ${it.fromState} by ${it.event}" } }
+            invalidTransition?.let { Timber.debug { "Attempted internalState transition from ${it.fromState} by ${it.event}" } }
         }
     }
 

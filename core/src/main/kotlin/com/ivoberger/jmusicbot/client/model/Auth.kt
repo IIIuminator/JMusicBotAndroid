@@ -21,11 +21,9 @@ import com.ivoberger.jmusicbot.client.exceptions.InvalidParametersException
 import com.ivoberger.jmusicbot.client.utils.base64encoded
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.Date
 import java.util.UUID
 
-@ExperimentalCoroutinesApi
 sealed class Auth {
 
     @JsonClass(generateAdapter = true)

@@ -41,9 +41,9 @@ import com.ivoberger.jmusicbot.client.utils.DEFAULT_PORT
 import com.ivoberger.jmusicbot.client.utils.listenForServerMulticast
 import com.ivoberger.jmusicbot.client.utils.process
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.logging.HttpLoggingInterceptor
@@ -54,14 +54,15 @@ import java.util.Timer
 import kotlin.concurrent.timer
 
 @Suppress("unused")
-@ExperimentalCoroutinesApi
 object JMusicBot {
 
     internal val stateMachine = makeStateMachine()
 
-    val state: State
+    internal val internalState: State
         get() = stateMachine.state
-    val stateBroadcast: BroadcastChannel<State> = ConflatedBroadcastChannel(state)
+    val stateBroadcast: BroadcastChannel<State> = ConflatedBroadcastChannel(internalState)
+    val state: ReceiveChannel<State>
+        get() = stateBroadcast.openSubscription()
 
     internal val mBaseComponent: BaseComponent = DaggerBaseComponent.builder()
         .baseModule(BaseModule(HttpLoggingInterceptor.Level.BASIC)).build()
@@ -92,17 +93,18 @@ object JMusicBot {
         InvalidParametersException::class, NotFoundException::class,
         ServerErrorException::class, IllegalStateException::class
     )
-    suspend fun connect(authUser: User, host: String) = withContext(Dispatchers.IO) {
-        Timber.debug { "Quick connect" }
-        if (!state.hasServer) discoverHost(host)
-        if (!state.isConnected) authorize(authUser)
-    }
+    suspend fun connect(authUser: User, host: String, token: Auth.Token? = null) =
+        withContext(Dispatchers.IO) {
+            Timber.debug { "Quick connect" }
+            if (!internalState.hasServer) discoverHost(host)
+            if (!internalState.isConnected) authorize(authUser, token)
+        }
 
     suspend fun discoverHost(knownHost: String? = null, port: Int = DEFAULT_PORT) =
         withContext(Dispatchers.IO) {
-            if (state.isDiscovering) return@withContext
+            if (internalState.isDiscovering) return@withContext
             Timber.debug { "Discovering host" }
-            if (!state.isDisconnected) stateMachine.transition(
+            if (!internalState.isDisconnected) stateMachine.transition(
                 Event.Disconnect()
             )
             stateMachine.transition(Event.StartDiscovery)
@@ -122,9 +124,9 @@ object JMusicBot {
         ServerErrorException::class, IllegalStateException::class
     )
     suspend fun authorize(authUser: User, token: Auth.Token? = null) = withContext(Dispatchers.IO) {
-        state.serverCheck()
+        internalState.serverCheck()
         Timber.debug { "Starting authorization" }
-        if (!state.authRequired) stateMachine.transition(Event.AuthExpired)
+        if (!internalState.authRequired) stateMachine.transition(Event.AuthExpired)
         if (tokenValid(authUser, token)) return@withContext
         try {
             register(authUser)
@@ -178,7 +180,7 @@ object JMusicBot {
     )
     private suspend fun register(user: User) = withContext(Dispatchers.IO) {
         Timber.debug { "Registering ${user.name}" }
-        state.serverCheck()
+        internalState.serverCheck()
         val credentials = Auth.Register(user)
         val token = mServiceClient!!.registerUser(credentials).process()!!
         Timber.debug { "Registered ${user.name}" }
@@ -191,7 +193,7 @@ object JMusicBot {
     )
     private suspend fun login(user: User) = withContext(Dispatchers.IO) {
         Timber.debug { "Logging in ${user.name}" }
-        state.serverCheck()
+        internalState.serverCheck()
         val credentials = Auth.Basic(user).toAuthHeader()
         Timber.debug { "Auth: $credentials" }
         val token =
@@ -202,7 +204,7 @@ object JMusicBot {
 
     @Throws(InvalidParametersException::class, AuthException::class)
     suspend fun changePassword(newPassword: String) = withContext(Dispatchers.IO) {
-        state.connectionCheck()
+        internalState.connectionCheck()
         val token = mServiceClient!!.changePassword(Auth.PasswordChange((newPassword))).process()!!
         stateMachine.transition(Event.Authorize(user!!, Auth.Token(token)))
         authToken?.also { user?.password = newPassword }
@@ -224,7 +226,7 @@ object JMusicBot {
         NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
     suspend fun deleteUser() = withContext(Dispatchers.IO) {
-        state.connectionCheck()
+        internalState.connectionCheck()
         Timber.debug { "Deleting user ${user?.name}" }
         authToken ?: throw IllegalStateException("Auth token is null")
         mServiceClient!!.deleteUser().process()
@@ -233,7 +235,7 @@ object JMusicBot {
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     suspend fun enqueue(song: Song) = withContext(Dispatchers.IO) {
-        state.connectionCheck()
+        internalState.connectionCheck()
         updateQueue(
             mServiceClient!!.enqueue(
                 song.id,
@@ -244,7 +246,7 @@ object JMusicBot {
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     suspend fun dequeue(song: Song) = withContext(Dispatchers.IO) {
-        state.connectionCheck()
+        internalState.connectionCheck()
         updateQueue(
             mServiceClient!!.dequeue(
                 song.id,
@@ -255,7 +257,7 @@ object JMusicBot {
 
     suspend fun moveEntry(entry: QueueEntry, providerId: String, songId: String, newPosition: Int) =
         withContext(Dispatchers.IO) {
-            state.connectionCheck()
+            internalState.connectionCheck()
             updateQueue(
                 mServiceClient!!.moveEntry(
                     entry,
@@ -268,54 +270,54 @@ object JMusicBot {
 
     suspend fun search(providerId: String, query: String): List<Song> =
         withContext(Dispatchers.IO) {
-            state.connectionCheck()
+            internalState.connectionCheck()
             return@withContext mServiceClient!!.searchForSong(providerId, query).process()
                 ?: listOf()
         }
 
     suspend fun suggestions(suggesterId: String): List<Song> = withContext(Dispatchers.IO) {
-        state.connectionCheck()
+        internalState.connectionCheck()
         return@withContext mServiceClient!!.getSuggestions(suggesterId).process() ?: listOf()
     }
 
     suspend fun deleteSuggestion(suggesterId: String, song: Song) = withContext(Dispatchers.IO) {
-        state.connectionCheck()
+        internalState.connectionCheck()
         mServiceClient!!.deleteSuggestion(suggesterId, song.id, song.provider.id).process()
     }
 
     suspend fun pause() = withContext(Dispatchers.IO) {
-        state.connectionCheck()
+        internalState.connectionCheck()
         updatePlayer(mServiceClient!!.pause().process())
     }
 
     suspend fun play() = withContext(Dispatchers.IO) {
-        state.connectionCheck()
+        internalState.connectionCheck()
         updatePlayer(mServiceClient!!.play().process())
     }
 
     suspend fun skip() = withContext(Dispatchers.IO) {
-        state.connectionCheck()
+        internalState.connectionCheck()
         updatePlayer(mServiceClient!!.skip().process())
     }
 
     suspend fun getProvider(): List<MusicBotPlugin> = withContext(Dispatchers.IO) {
-        state.connectionCheck()
+        internalState.connectionCheck()
         return@withContext mServiceClient!!.getProvider().process() ?: listOf()
     }
 
     suspend fun getSuggesters(): List<MusicBotPlugin> = withContext(Dispatchers.IO) {
-        state.connectionCheck()
+        internalState.connectionCheck()
         return@withContext mServiceClient!!.getSuggesters().process() ?: listOf()
     }
 
     suspend fun getVersionInfo(): VersionInfo = withContext(Dispatchers.IO) {
-        state.serverCheck()
+        internalState.serverCheck()
         return@withContext mServiceClient!!.getVersionInfo().process()!!
     }
 
-    fun getQueue(period: Long = 500): BroadcastChannel<List<QueueEntry>> {
+    fun getQueue(period: Long = 500): ReceiveChannel<List<QueueEntry>> {
         startQueueUpdates(period)
-        return mQueue
+        return mQueue.openSubscription()
     }
 
     fun startQueueUpdates(period: Long = 500) {
@@ -327,9 +329,9 @@ object JMusicBot {
         mQueueUpdateTimer = null
     }
 
-    fun getPlayerState(period: Long = 500): BroadcastChannel<PlayerState> {
+    fun getPlayerState(period: Long = 500): ReceiveChannel<PlayerState> {
         startPlayerUpdates(period)
-        return mPlayerState
+        return mPlayerState.openSubscription()
     }
 
     fun startPlayerUpdates(period: Long = 500) {
@@ -345,7 +347,7 @@ object JMusicBot {
     private fun updateQueue(newQueue: List<QueueEntry>? = null) = runBlocking(Dispatchers.IO) {
         if (newQueue != null) Timber.debug { "Manual Queue Update" }
         try {
-            state.connectionCheck()
+            internalState.connectionCheck()
             val queue = newQueue ?: mServiceClient!!.getQueue().process() ?: listOf()
             mQueue.send(queue)
         } catch (e: Exception) {
@@ -356,11 +358,11 @@ object JMusicBot {
     private fun updatePlayer(playerState: PlayerState? = null) = runBlocking(Dispatchers.IO) {
         if (playerState != null) Timber.debug { "Manual Player Update" }
         try {
-            state.connectionCheck()
+            internalState.connectionCheck()
             val state = playerState ?: mServiceClient!!.getPlayerState().process()!!
             mPlayerState.send(state)
         } catch (e: Exception) {
-            Timber.warn(e) { "Player state update failed" }
+            Timber.warn(e) { "Player internalState update failed" }
         }
     }
 }

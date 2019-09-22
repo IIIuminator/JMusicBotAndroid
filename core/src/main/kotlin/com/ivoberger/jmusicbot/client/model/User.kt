@@ -18,9 +18,7 @@ package com.ivoberger.jmusicbot.client.model
 import com.ivoberger.jmusicbot.client.JMusicBot
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
 @JsonClass(generateAdapter = true)
 data class User(
     @Json(name = "name") val name: String,

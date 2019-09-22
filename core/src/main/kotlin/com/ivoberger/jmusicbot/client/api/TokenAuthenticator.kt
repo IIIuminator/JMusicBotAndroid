@@ -49,7 +49,7 @@ class TokenAuthenticator : Authenticator {
                     }
                     AuthType.TOKEN -> {
                         Timber.debug { "TOKEN Auth" }
-                        if (!JMusicBot.state.hasServer) {
+                        if (!JMusicBot.internalState.hasServer) {
                             JMusicBot.discoverHost()
                         }
                         JMusicBot.user?.let { JMusicBot.authorize(it) }
