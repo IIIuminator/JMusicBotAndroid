@@ -93,7 +93,7 @@ internal class ConnectedTest {
         mMockServer.enqueue(MockResponse().setBody("[]"))
 
         runBlocking {
-            val queueUpdates = JMusicBot.getQueue().openSubscription()
+            val queueUpdates = JMusicBot.getQueue()
             assertEquals(Queues.full, queueUpdates.receive())
             assertEquals(Queues.halfFull, queueUpdates.receive())
             assertEquals(Queues.empty, queueUpdates.receive())
@@ -108,7 +108,7 @@ internal class ConnectedTest {
         mMockServer.enqueue(MockResponse().setBody(mPlayerStateAdapter.toJson(PlayerStates.paused)))
 
         runBlocking {
-            val playerUpdates = JMusicBot.getPlayerState().openSubscription()
+            val playerUpdates = JMusicBot.getPlayerState()
             assertEquals(PlayerStates.playingCaliforniacation, playerUpdates.receive())
             assertEquals(PlayerStates.stopped, playerUpdates.receive())
             assertEquals(PlayerStates.paused, playerUpdates.receive())

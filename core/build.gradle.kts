@@ -35,8 +35,8 @@ dependencies {
     implementation(Libs.kotlin_stdlib_jdk8)
     implementation(Libs.kotlinx_coroutines_core)
 
-    api(Libs.timber_jdk)
-    api(Libs.statemachine)
+    implementation(Libs.statemachine)
+    implementation(Libs.timber_jdk)
 
     implementation(Libs.dagger)
     kapt(Libs.dagger_compiler)
@@ -52,5 +52,4 @@ dependencies {
     testImplementation(Libs.junit_jupiter)
     testImplementation(Libs.kotlinx_coroutines_test)
     testImplementation(Libs.mockwebserver)
-    testImplementation(Libs.koda_time)
 }
