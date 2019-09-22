@@ -58,9 +58,9 @@ object JMusicBot {
 
     internal val stateMachine = makeStateMachine()
 
-    internal val internalState: State
+    val currentState: State
         get() = stateMachine.state
-    val stateBroadcast: BroadcastChannel<State> = ConflatedBroadcastChannel(internalState)
+    val stateBroadcast: BroadcastChannel<State> = ConflatedBroadcastChannel(currentState)
     val state: ReceiveChannel<State>
         get() = stateBroadcast.openSubscription()
 
@@ -96,15 +96,15 @@ object JMusicBot {
     suspend fun connect(authUser: User, host: String, token: Auth.Token? = null) =
         withContext(Dispatchers.IO) {
             Timber.debug { "Quick connect" }
-            if (!internalState.hasServer) discoverHost(host)
-            if (!internalState.isConnected) authorize(authUser, token)
+            if (!currentState.hasServer) discoverHost(host)
+            if (!currentState.isConnected) authorize(authUser, token)
         }
 
     suspend fun discoverHost(knownHost: String? = null, port: Int = DEFAULT_PORT) =
         withContext(Dispatchers.IO) {
-            if (internalState.isDiscovering) return@withContext
+            if (currentState.isDiscovering) return@withContext
             Timber.debug { "Discovering host" }
-            if (!internalState.isDisconnected) stateMachine.transition(
+            if (!currentState.isDisconnected) stateMachine.transition(
                 Event.Disconnect()
             )
             stateMachine.transition(Event.StartDiscovery)
@@ -124,9 +124,9 @@ object JMusicBot {
         ServerErrorException::class, IllegalStateException::class
     )
     suspend fun authorize(authUser: User, token: Auth.Token? = null) = withContext(Dispatchers.IO) {
-        internalState.serverCheck()
+        currentState.serverCheck()
         Timber.debug { "Starting authorization" }
-        if (!internalState.authRequired) stateMachine.transition(Event.AuthExpired)
+        if (!currentState.authRequired) stateMachine.transition(Event.AuthExpired)
         if (tokenValid(authUser, token)) return@withContext
         try {
             register(authUser)
@@ -180,7 +180,7 @@ object JMusicBot {
     )
     private suspend fun register(user: User) = withContext(Dispatchers.IO) {
         Timber.debug { "Registering ${user.name}" }
-        internalState.serverCheck()
+        currentState.serverCheck()
         val credentials = Auth.Register(user)
         val token = mServiceClient!!.registerUser(credentials).process()!!
         Timber.debug { "Registered ${user.name}" }
@@ -193,7 +193,7 @@ object JMusicBot {
     )
     private suspend fun login(user: User) = withContext(Dispatchers.IO) {
         Timber.debug { "Logging in ${user.name}" }
-        internalState.serverCheck()
+        currentState.serverCheck()
         val credentials = Auth.Basic(user).toAuthHeader()
         Timber.debug { "Auth: $credentials" }
         val token =
@@ -204,7 +204,7 @@ object JMusicBot {
 
     @Throws(InvalidParametersException::class, AuthException::class)
     suspend fun changePassword(newPassword: String) = withContext(Dispatchers.IO) {
-        internalState.connectionCheck()
+        currentState.connectionCheck()
         val token = mServiceClient!!.changePassword(Auth.PasswordChange((newPassword))).process()!!
         stateMachine.transition(Event.Authorize(user!!, Auth.Token(token)))
         authToken?.also { user?.password = newPassword }
@@ -226,7 +226,7 @@ object JMusicBot {
         NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
     suspend fun deleteUser() = withContext(Dispatchers.IO) {
-        internalState.connectionCheck()
+        currentState.connectionCheck()
         Timber.debug { "Deleting user ${user?.name}" }
         authToken ?: throw IllegalStateException("Auth token is null")
         mServiceClient!!.deleteUser().process()
@@ -235,7 +235,7 @@ object JMusicBot {
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     suspend fun enqueue(song: Song) = withContext(Dispatchers.IO) {
-        internalState.connectionCheck()
+        currentState.connectionCheck()
         updateQueue(
             mServiceClient!!.enqueue(
                 song.id,
@@ -246,7 +246,7 @@ object JMusicBot {
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     suspend fun dequeue(song: Song) = withContext(Dispatchers.IO) {
-        internalState.connectionCheck()
+        currentState.connectionCheck()
         updateQueue(
             mServiceClient!!.dequeue(
                 song.id,
@@ -257,7 +257,7 @@ object JMusicBot {
 
     suspend fun moveEntry(entry: QueueEntry, providerId: String, songId: String, newPosition: Int) =
         withContext(Dispatchers.IO) {
-            internalState.connectionCheck()
+            currentState.connectionCheck()
             updateQueue(
                 mServiceClient!!.moveEntry(
                     entry,
@@ -270,48 +270,48 @@ object JMusicBot {
 
     suspend fun search(providerId: String, query: String): List<Song> =
         withContext(Dispatchers.IO) {
-            internalState.connectionCheck()
+            currentState.connectionCheck()
             return@withContext mServiceClient!!.searchForSong(providerId, query).process()
                 ?: listOf()
         }
 
     suspend fun suggestions(suggesterId: String): List<Song> = withContext(Dispatchers.IO) {
-        internalState.connectionCheck()
+        currentState.connectionCheck()
         return@withContext mServiceClient!!.getSuggestions(suggesterId).process() ?: listOf()
     }
 
     suspend fun deleteSuggestion(suggesterId: String, song: Song) = withContext(Dispatchers.IO) {
-        internalState.connectionCheck()
+        currentState.connectionCheck()
         mServiceClient!!.deleteSuggestion(suggesterId, song.id, song.provider.id).process()
     }
 
     suspend fun pause() = withContext(Dispatchers.IO) {
-        internalState.connectionCheck()
+        currentState.connectionCheck()
         updatePlayer(mServiceClient!!.pause().process())
     }
 
     suspend fun play() = withContext(Dispatchers.IO) {
-        internalState.connectionCheck()
+        currentState.connectionCheck()
         updatePlayer(mServiceClient!!.play().process())
     }
 
     suspend fun skip() = withContext(Dispatchers.IO) {
-        internalState.connectionCheck()
+        currentState.connectionCheck()
         updatePlayer(mServiceClient!!.skip().process())
     }
 
     suspend fun getProvider(): List<MusicBotPlugin> = withContext(Dispatchers.IO) {
-        internalState.connectionCheck()
+        currentState.connectionCheck()
         return@withContext mServiceClient!!.getProvider().process() ?: listOf()
     }
 
     suspend fun getSuggesters(): List<MusicBotPlugin> = withContext(Dispatchers.IO) {
-        internalState.connectionCheck()
+        currentState.connectionCheck()
         return@withContext mServiceClient!!.getSuggesters().process() ?: listOf()
     }
 
     suspend fun getVersionInfo(): VersionInfo = withContext(Dispatchers.IO) {
-        internalState.serverCheck()
+        currentState.serverCheck()
         return@withContext mServiceClient!!.getVersionInfo().process()!!
     }
 
@@ -347,7 +347,7 @@ object JMusicBot {
     private fun updateQueue(newQueue: List<QueueEntry>? = null) = runBlocking(Dispatchers.IO) {
         if (newQueue != null) Timber.debug { "Manual Queue Update" }
         try {
-            internalState.connectionCheck()
+            currentState.connectionCheck()
             val queue = newQueue ?: mServiceClient!!.getQueue().process() ?: listOf()
             mQueue.send(queue)
         } catch (e: Exception) {
@@ -358,11 +358,11 @@ object JMusicBot {
     private fun updatePlayer(playerState: PlayerState? = null) = runBlocking(Dispatchers.IO) {
         if (playerState != null) Timber.debug { "Manual Player Update" }
         try {
-            internalState.connectionCheck()
+            currentState.connectionCheck()
             val state = playerState ?: mServiceClient!!.getPlayerState().process()!!
             mPlayerState.send(state)
         } catch (e: Exception) {
-            Timber.warn(e) { "Player internalState update failed" }
+            Timber.warn(e) { "Player currentState update failed" }
         }
     }
 }

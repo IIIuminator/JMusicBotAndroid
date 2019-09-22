@@ -208,13 +208,13 @@ internal class AuthTest {
         assertEquals(token, JMusicBot.authToken.toString())
         assertEquals(testUserName, JMusicBot.user?.name)
         assertEquals(newTestUser.permissions, JMusicBot.user?.permissions)
-        assertTrue(JMusicBot.internalState.isConnected)
+        assertTrue(JMusicBot.currentState.isConnected)
     }
 
     private fun checkForAuthFailure() {
         assertNull(JMusicBot.authToken)
         assertNull(JMusicBot.user)
-        assertTrue(JMusicBot.internalState.hasServer)
+        assertTrue(JMusicBot.currentState.hasServer)
     }
 
     private fun checkForRegisterRequest() {

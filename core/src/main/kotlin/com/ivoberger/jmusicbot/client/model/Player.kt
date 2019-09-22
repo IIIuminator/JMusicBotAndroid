@@ -20,7 +20,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class PlayerState(
-    @Json(name = "internalState") val state: PlayerStates,
+    @Json(name = "currentState") val state: PlayerStates,
     @Json(name = "songEntry") val songEntry: SongEntry?,
     @Json(name = "progress") val progress: Int = 0
 ) {
