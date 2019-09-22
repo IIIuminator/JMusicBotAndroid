@@ -2,17 +2,15 @@ plugins {
     kotlin("jvm")
     kotlin("kapt")
     id("org.jetbrains.dokka")
+    jacoco
     `maven-publish`
 }
 
-tasks.test {
-    useJUnitPlatform()
-    finalizedBy(tasks.jacocoTestReport)
-}
+tasks.test { useJUnitPlatform() }
 
 tasks.jacocoTestReport {
     reports {
-        xml.isEnabled = false
+        xml.isEnabled = true
         csv.isEnabled = false
     }
 }

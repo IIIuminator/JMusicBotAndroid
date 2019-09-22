@@ -1,4 +1,5 @@
 import de.fayard.BuildSrcVersionsTask
+import de.fayard.VersionsOnlyMode
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -13,6 +14,7 @@ buildscript {
         classpath(Libs.android_maven_publish)
         classpath(Libs.dokka_gradle_plugin)
         classpath(Libs.dokka_android_gradle_plugin)
+        classpath("com.dicedmelon.gradle:jacoco-android:0.1.4")
     }
 }
 
@@ -25,9 +27,7 @@ plugins {
 
 subprojects {
     group = "com.ivoberger.jmusicbot-client"
-    version = "0.8.4"
-
-    apply(plugin = "org.gradle.jacoco")
+    version = "0.9.0"
 
     repositories {
         google()
@@ -50,6 +50,11 @@ subprojects {
         from(dokka.get().outputDirectory)
         dependsOn(dokka)
     }
+}
+
+buildSrcVersions {
+    versionsOnlyMode = VersionsOnlyMode.KOTLIN_OBJECT
+    versionsOnlyFile = "versions.gradle.kts"
 }
 
 publishing {

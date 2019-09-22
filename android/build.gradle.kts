@@ -5,13 +5,14 @@ plugins {
     kotlin("kapt")
     id("org.jetbrains.dokka-android")
     id("digital.wup.android-maven-publish")
+    id("jacoco-android")
 }
 
 android {
-    compileSdkVersion(28)
+    compileSdkVersion(29)
     defaultConfig {
         minSdkVersion(21)
-        targetSdkVersion(28)
+        targetSdkVersion(29)
     }
 
     sourceSets {
@@ -33,7 +34,6 @@ android {
         }
     }
     packagingOptions.pickFirst("META-INF/atomicfu.kotlin_module")
-
 }
 
 tasks.register<Jar>("sourcesJar") {

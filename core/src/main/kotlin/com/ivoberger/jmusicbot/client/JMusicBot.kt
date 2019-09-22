@@ -53,9 +53,6 @@ import timber.log.warn
 import java.util.Timer
 import kotlin.concurrent.timer
 
-/**
- * JDOC test!
- */
 @Suppress("unused")
 @ExperimentalCoroutinesApi
 object JMusicBot {

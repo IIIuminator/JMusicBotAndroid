@@ -11,9 +11,9 @@ import org.gradle.plugin.use.PluginDependencySpec
  * YOU are responsible for updating manually the dependency version.
  */
 object Versions {
-    const val core_ktx: String = "1.1.0-rc03"
+    const val core_ktx: String = "1.1.0"
 
-    const val lifecycle_extensions: String = "2.2.0-alpha03"
+    const val lifecycle_extensions: String = "2.2.0-alpha05"
 
     const val aapt2: String = "3.5.0-5435860"
 
@@ -22,6 +22,8 @@ object Versions {
     const val lint_gradle: String = "26.5.0"
 
     const val java_jwt: String = "3.8.2"
+
+    const val jacoco_android: String = "0.1.4"
 
     const val com_diffplug_gradle_spotless_gradle_plugin: String = "3.24.2"
 
@@ -35,13 +37,13 @@ object Versions {
 
     const val com_squareup_moshi: String = "1.8.0"
 
-    const val com_squareup_okhttp3: String = "4.1.0"
+    const val com_squareup_okhttp3: String = "4.2.0"
 
     const val com_squareup_retrofit2: String = "2.6.1"
 
     const val statemachine: String = "0.2.0"
 
-    const val de_fayard_buildsrcversions_gradle_plugin: String = "0.4.2"
+    const val de_fayard_buildsrcversions_gradle_plugin: String = "0.6.1"
 
     const val android_maven_publish: String = "3.6.2"
 
@@ -49,16 +51,16 @@ object Versions {
 
     const val org_jetbrains_kotlin: String = "1.3.50"
 
-    const val org_jetbrains_kotlinx: String = "1.3.0"
+    const val org_jetbrains_kotlinx: String = "1.3.1"
 
-    const val junit_jupiter: String = "5.5.1"
+    const val junit_jupiter: String = "5.5.2"
 
     /**
      *
      * See issue 19: How to update Gradle itself?
      * https://github.com/jmfayard/buildSrcVersions/issues/19
      */
-    const val gradleLatestVersion: String = "5.6.1"
+    const val gradleLatestVersion: String = "5.6.2"
 
     const val gradleCurrentVersion: String = "5.6.1"
 }
