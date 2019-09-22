@@ -93,7 +93,14 @@ object JMusicBot {
         InvalidParametersException::class, NotFoundException::class,
         ServerErrorException::class, IllegalStateException::class
     )
-    suspend fun connect(authUser: User, host: String, token: Auth.Token? = null) =
+    suspend fun connect(authUser: User, host: String, token: String? = null) =
+        connect(authUser, host, token?.let { Auth.Token(it) })
+
+    @Throws(
+        InvalidParametersException::class, NotFoundException::class,
+        ServerErrorException::class, IllegalStateException::class
+    )
+    suspend fun connect(authUser: User, host: String, token: Auth.Token?) =
         withContext(Dispatchers.IO) {
             Timber.debug { "Quick connect" }
             if (!currentState.hasServer) discoverHost(host)
@@ -123,33 +130,42 @@ object JMusicBot {
         InvalidParametersException::class, NotFoundException::class,
         ServerErrorException::class, IllegalStateException::class
     )
-    suspend fun authorize(authUser: User, token: Auth.Token? = null) = withContext(Dispatchers.IO) {
-        currentState.serverCheck()
-        Timber.debug { "Starting authorization" }
-        if (!currentState.authRequired) stateMachine.transition(Event.AuthExpired)
-        if (tokenValid(authUser, token)) return@withContext
-        try {
-            register(authUser)
-            if (!authUser.password.isNullOrBlank()) changePassword(
-                authUser.password!!
-            )
-            return@withContext
-        } catch (e: UsernameTakenException) {
-            Timber.warn(e) { e.message ?: "" }
-            if (authUser.password.isNullOrBlank()) {
-                Timber.debug { "No passwords found, throwing exception" }
+    suspend fun authorize(authUser: User, token: String? = null): Auth.Token =
+        authorize(authUser, token?.let { Auth.Token(it) })
+
+    @Throws(
+        InvalidParametersException::class, NotFoundException::class,
+        ServerErrorException::class, IllegalStateException::class
+    )
+    suspend fun authorize(authUser: User, token: Auth.Token?): Auth.Token =
+        withContext(Dispatchers.IO) {
+            currentState.serverCheck()
+            Timber.debug { "Starting authorization" }
+            if (!currentState.authRequired) stateMachine.transition(Event.AuthExpired)
+            if (tokenValid(authUser, token)) return@withContext token!!
+            try {
+                register(authUser)
+                if (!authUser.password.isNullOrBlank()) changePassword(
+                    authUser.password!!
+                )
+                return@withContext authToken!!
+            } catch (e: UsernameTakenException) {
+                Timber.warn(e) { e.message ?: "" }
+                if (authUser.password.isNullOrBlank()) {
+                    Timber.debug { "No passwords found, throwing exception" }
+                    throw e
+                }
+            }
+            try {
+                login(authUser)
+                if (tokenValid(authUser, authToken!!)) return@withContext authToken!!
+                else throw Exception()
+            } catch (e: Exception) {
+                Timber.warn(e) { e.message ?: "" }
+                Timber.debug { "Authorization failed" }
                 throw e
             }
         }
-        try {
-            login(authUser)
-            if (tokenValid(authUser, authToken!!)) return@withContext
-        } catch (e: Exception) {
-            Timber.warn(e) { e.message ?: "" }
-            Timber.debug { "Authorization failed" }
-            throw e
-        }
-    }
 
     private suspend fun tokenValid(authUser: User, authToken: Auth.Token?): Boolean {
         if (authToken == null) {
@@ -178,7 +194,7 @@ object JMusicBot {
         InvalidParametersException::class, AuthException::class,
         NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
-    private suspend fun register(user: User) = withContext(Dispatchers.IO) {
+    private suspend fun register(user: User) = withContext<Unit>(Dispatchers.IO) {
         Timber.debug { "Registering ${user.name}" }
         currentState.serverCheck()
         val credentials = Auth.Register(user)
@@ -191,7 +207,7 @@ object JMusicBot {
         InvalidParametersException::class, AuthException::class,
         NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
-    private suspend fun login(user: User) = withContext(Dispatchers.IO) {
+    private suspend fun login(user: User) = withContext<Unit>(Dispatchers.IO) {
         Timber.debug { "Logging in ${user.name}" }
         currentState.serverCheck()
         val credentials = Auth.Basic(user).toAuthHeader()
@@ -210,7 +226,7 @@ object JMusicBot {
         authToken?.also { user?.password = newPassword }
     }
 
-    suspend fun logout() = withContext(Dispatchers.IO) {
+    suspend fun logout() = withContext<Unit>(Dispatchers.IO) {
         stopQueueUpdates()
         stopPlayerUpdates()
         stateMachine.transition(Event.AuthExpired)
@@ -225,7 +241,7 @@ object JMusicBot {
         InvalidParametersException::class, AuthException::class,
         NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
-    suspend fun deleteUser() = withContext(Dispatchers.IO) {
+    suspend fun deleteUser() = withContext<Unit>(Dispatchers.IO) {
         currentState.connectionCheck()
         Timber.debug { "Deleting user ${user?.name}" }
         authToken ?: throw IllegalStateException("Auth token is null")
