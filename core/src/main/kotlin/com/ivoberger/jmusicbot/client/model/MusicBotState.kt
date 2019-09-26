@@ -18,11 +18,10 @@ package com.ivoberger.jmusicbot.client.model
 import com.ivoberger.jmusicbot.client.JMusicBot
 import com.ivoberger.jmusicbot.client.di.ServerModule
 import com.ivoberger.jmusicbot.client.di.UserModule
+import com.ivoberger.jmusicbot.client.logger
 import com.tinder.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.sendBlocking
-import timber.log.Timber
-import timber.log.debug
 
 @ExperimentalCoroutinesApi
 internal fun JMusicBot.makeStateMachine(): StateMachine<State, Event, SideEffect> =
@@ -49,7 +48,7 @@ internal fun JMusicBot.makeStateMachine(): StateMachine<State, Event, SideEffect
         onTransition { transition ->
             val validTransition = transition as? StateMachine.Transition.Valid
             validTransition?.let { trans ->
-                Timber.debug { "State transition from ${trans.fromState} to ${trans.toState} by ${trans.event}" }
+                logger.debug { "State transition from ${trans.fromState} to ${trans.toState} by ${trans.event}" }
                 when (trans.sideEffect) {
                     is SideEffect.StartServerSession -> {
                         val event = trans.event as Event.ServerFound
@@ -76,7 +75,7 @@ internal fun JMusicBot.makeStateMachine(): StateMachine<State, Event, SideEffect
                 return@onTransition
             }
             val invalidTransition = transition as? StateMachine.Transition.Invalid
-            invalidTransition?.let { Timber.debug { "Attempted currentState transition from ${it.fromState} by ${it.event}" } }
+            invalidTransition?.let { logger.debug { "Attempted currentState transition from ${it.fromState} by ${it.event}" } }
         }
     }
 

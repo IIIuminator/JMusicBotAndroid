@@ -1,5 +1,4 @@
 import de.fayard.BuildSrcVersionsTask
-import de.fayard.VersionsOnlyMode
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -31,7 +30,6 @@ subprojects {
     repositories {
         google()
         jcenter()
-        maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
     }
 
     tasks.withType<KotlinCompile> { kotlinOptions { jvmTarget = "1.8" } }
@@ -41,6 +39,9 @@ subprojects {
             outputFormat = "html"
             outputDirectory = "$buildDir/javadoc"
         }
+        dependencies {
+            "implementation"(Libs.kotlin_logging)
+        }
     }
 
     tasks.register<Jar>("javadocJar") {
@@ -49,11 +50,6 @@ subprojects {
         from(dokka.get().outputDirectory)
         dependsOn(dokka)
     }
-}
-
-buildSrcVersions {
-    versionsOnlyMode = VersionsOnlyMode.KOTLIN_OBJECT
-    versionsOnlyFile = "versions.gradle.kts"
 }
 
 publishing {

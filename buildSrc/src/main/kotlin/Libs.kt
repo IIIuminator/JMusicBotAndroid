@@ -43,8 +43,6 @@ object Libs {
       "com.diffplug.gradle.spotless:com.diffplug.gradle.spotless.gradle.plugin:" +
       Versions.com_diffplug_gradle_spotless_gradle_plugin
 
-  const val koda_time: String = "com.github.debop:koda-time:" + Versions.koda_time
-
   /**
    * https://github.com/google/dagger
    */
@@ -55,8 +53,6 @@ object Libs {
    * https://github.com/google/dagger
    */
   const val dagger: String = "com.google.dagger:dagger:" + Versions.com_google_dagger
-
-  const val timber_jdk: String = "com.jakewharton.timber:timber-jdk:" + Versions.timber_jdk
 
   const val splitties_fun_pack_android_base: String =
       "com.louiscad.splitties:splitties-fun-pack-android-base:" +
@@ -112,6 +108,12 @@ object Libs {
 
   const val android_maven_publish: String = "digital.wup:android-maven-publish:" +
       Versions.android_maven_publish
+
+  /**
+   * https://github.com/MicroUtils/kotlin-logging
+   */
+  const val kotlin_logging: String = "io.github.microutils:kotlin-logging:" +
+      Versions.kotlin_logging
 
   const val dokka_android_gradle_plugin: String =
       "org.jetbrains.dokka:dokka-android-gradle-plugin:" + Versions.org_jetbrains_dokka
@@ -174,4 +176,9 @@ object Libs {
    * https://junit.org/junit5/
    */
   const val junit_jupiter: String = "org.junit.jupiter:junit-jupiter:" + Versions.junit_jupiter
+
+  /**
+   * http://www.slf4j.org
+   */
+  const val slf4j_simple: String = "org.slf4j:slf4j-simple:" + Versions.slf4j_simple
 }

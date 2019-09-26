@@ -16,11 +16,9 @@
 package com.ivoberger.jmusicbot.client.model
 
 import com.auth0.jwt.interfaces.Claim
+import com.ivoberger.jmusicbot.client.logger
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.Json
-import timber.log.Timber
-import timber.log.debug
-import timber.log.error
 import java.util.Locale
 
 enum class Permissions(val label: String) {
@@ -74,10 +72,10 @@ enum class Permissions(val label: String) {
                 try {
                     permissions.add(valueOf(it.toUpperCase(Locale.getDefault())))
                 } catch (e: IllegalArgumentException) {
-                    Timber.error(e) { "Unknown Permission: ${it.toUpperCase(Locale.getDefault())}" }
+                    logger.error(e) { "Unknown Permission: ${it.toUpperCase(Locale.getDefault())}" }
                 }
             }
-            Timber.debug { "Retrieved permissions from token claims: $permissions" }
+            logger.debug { "Retrieved permissions from token claims: $permissions" }
             return permissions
         }
 

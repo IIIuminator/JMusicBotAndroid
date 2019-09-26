@@ -47,9 +47,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.logging.HttpLoggingInterceptor
-import timber.log.Timber
-import timber.log.debug
-import timber.log.warn
 import java.util.Timer
 import kotlin.concurrent.timer
 
@@ -102,7 +99,7 @@ object JMusicBot {
     )
     suspend fun connect(authUser: User, host: String, token: Auth.Token?) =
         withContext(Dispatchers.IO) {
-            Timber.debug { "Quick connect" }
+            logger.debug { "Quick connect" }
             if (!currentState.hasServer) discoverHost(host)
             if (!currentState.isConnected) authorize(authUser, token)
         }
@@ -110,7 +107,7 @@ object JMusicBot {
     suspend fun discoverHost(knownHost: String? = null, port: Int = DEFAULT_PORT) =
         withContext(Dispatchers.IO) {
             if (currentState.isDiscovering) return@withContext
-            Timber.debug { "Discovering host" }
+            logger.debug { "Discovering host" }
             if (!currentState.isDisconnected) stateMachine.transition(
                 Event.Disconnect()
             )
@@ -118,11 +115,11 @@ object JMusicBot {
             val hostAddress = knownHost ?: listenForServerMulticast(port)
             hostAddress?.let {
                 val newUrl = knownHost ?: it
-                Timber.debug { "Found host: $newUrl" }
+                logger.debug { "Found host: $newUrl" }
                 stateMachine.transition(Event.ServerFound(newUrl, port))
                 return@withContext
             }
-            Timber.debug { "No host found" }
+            logger.debug { "No host found" }
             stateMachine.transition(Event.Disconnect())
         }
 
@@ -140,7 +137,7 @@ object JMusicBot {
     suspend fun authorize(authUser: User, token: Auth.Token?): Auth.Token =
         withContext(Dispatchers.IO) {
             currentState.serverCheck()
-            Timber.debug { "Starting authorization" }
+            logger.debug { "Starting authorization" }
             if (!currentState.authRequired) stateMachine.transition(Event.AuthExpired)
             if (tokenValid(authUser, token)) return@withContext token!!
             try {
@@ -150,9 +147,9 @@ object JMusicBot {
                 )
                 return@withContext authToken!!
             } catch (e: UsernameTakenException) {
-                Timber.warn(e) { e.message ?: "" }
+                logger.warn(e) { e.message ?: "" }
                 if (authUser.password.isNullOrBlank()) {
-                    Timber.debug { "No passwords found, throwing exception" }
+                    logger.debug { "No passwords found, throwing exception" }
                     throw e
                 }
             }
@@ -161,31 +158,31 @@ object JMusicBot {
                 if (tokenValid(authUser, authToken!!)) return@withContext authToken!!
                 else throw Exception()
             } catch (e: Exception) {
-                Timber.warn(e) { e.message ?: "" }
-                Timber.debug { "Authorization failed" }
+                logger.warn(e) { e.message ?: "" }
+                logger.debug { "Authorization failed" }
                 throw e
             }
         }
 
     private suspend fun tokenValid(authUser: User, authToken: Auth.Token?): Boolean {
         if (authToken == null) {
-            Timber.debug { "Invalid Token: No token stored" }
+            logger.debug { "Invalid Token: No token stored" }
             return false
         }
         try {
             if (authToken.isExpired()) {
-                Timber.debug { "Invalid Token: Token expired" }
+                logger.debug { "Invalid Token: Token expired" }
                 return false
             }
             val tmpUser = mServiceClient!!.testToken(authToken.toAuthHeader()).process()
             if (tmpUser?.name == authUser.name) {
-                Timber.debug { "Valid Token: ${authUser.name}" }
+                logger.debug { "Valid Token: ${authUser.name}" }
                 stateMachine.transition(Event.Authorize(authUser, authToken))
                 return true
             }
-            Timber.debug { "Invalid Token: User changed" }
+            logger.debug { "Invalid Token: User changed" }
         } catch (e: Exception) {
-            Timber.debug { "Invalid Token: Test failed (${e.message})" }
+            logger.debug { "Invalid Token: Test failed (${e.message})" }
         }
         return false
     }
@@ -195,11 +192,11 @@ object JMusicBot {
         NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
     private suspend fun register(user: User) = withContext<Unit>(Dispatchers.IO) {
-        Timber.debug { "Registering ${user.name}" }
+        logger.debug { "Registering ${user.name}" }
         currentState.serverCheck()
         val credentials = Auth.Register(user)
         val token = mServiceClient!!.registerUser(credentials).process()!!
-        Timber.debug { "Registered ${user.name}" }
+        logger.debug { "Registered ${user.name}" }
         stateMachine.transition(Event.Authorize(user, Auth.Token(token)))
     }
 
@@ -208,13 +205,13 @@ object JMusicBot {
         NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
     private suspend fun login(user: User) = withContext<Unit>(Dispatchers.IO) {
-        Timber.debug { "Logging in ${user.name}" }
+        logger.debug { "Logging in ${user.name}" }
         currentState.serverCheck()
         val credentials = Auth.Basic(user).toAuthHeader()
-        Timber.debug { "Auth: $credentials" }
+        logger.debug { "Auth: $credentials" }
         val token =
             mServiceClient!!.loginUser(credentials).process(notFoundType = NotFoundException.Type.USER)!!
-        Timber.debug { "Logged in ${user.name}" }
+        logger.debug { "Logged in ${user.name}" }
         stateMachine.transition(Event.Authorize(user, Auth.Token(token)))
     }
 
@@ -243,7 +240,7 @@ object JMusicBot {
     )
     suspend fun deleteUser() = withContext<Unit>(Dispatchers.IO) {
         currentState.connectionCheck()
-        Timber.debug { "Deleting user ${user?.name}" }
+        logger.debug { "Deleting user ${user?.name}" }
         authToken ?: throw IllegalStateException("Auth token is null")
         mServiceClient!!.deleteUser().process()
         stateMachine.transition(Event.AuthExpired)
@@ -361,24 +358,24 @@ object JMusicBot {
     }
 
     private fun updateQueue(newQueue: List<QueueEntry>? = null) = runBlocking(Dispatchers.IO) {
-        if (newQueue != null) Timber.debug { "Manual Queue Update" }
+        if (newQueue != null) logger.debug { "Manual Queue Update" }
         try {
             currentState.connectionCheck()
             val queue = newQueue ?: mServiceClient!!.getQueue().process() ?: listOf()
             mQueue.send(queue)
         } catch (e: Exception) {
-            Timber.warn(e) { "Queue update failed" }
+            logger.warn(e) { "Queue update failed" }
         }
     }
 
     private fun updatePlayer(playerState: PlayerState? = null) = runBlocking(Dispatchers.IO) {
-        if (playerState != null) Timber.debug { "Manual Player Update" }
+        if (playerState != null) logger.debug { "Manual Player Update" }
         try {
             currentState.connectionCheck()
             val state = playerState ?: mServiceClient!!.getPlayerState().process()!!
             mPlayerState.send(state)
         } catch (e: Exception) {
-            Timber.warn(e) { "Player currentState update failed" }
+            logger.warn(e) { "Player currentState update failed" }
         }
     }
 }

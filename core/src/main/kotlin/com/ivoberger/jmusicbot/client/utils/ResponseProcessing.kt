@@ -20,10 +20,9 @@ import com.ivoberger.jmusicbot.client.exceptions.InvalidParametersException
 import com.ivoberger.jmusicbot.client.exceptions.NotFoundException
 import com.ivoberger.jmusicbot.client.exceptions.ServerErrorException
 import com.ivoberger.jmusicbot.client.exceptions.UsernameTakenException
+import com.ivoberger.jmusicbot.client.logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import retrofit2.Response
-import timber.log.Timber
-import timber.log.error
 
 @ExperimentalCoroutinesApi
 @Throws(
@@ -49,7 +48,7 @@ internal inline fun <reified T> Response<T>.process(
         404 -> throw NotFoundException(notFoundType, errorBody()!!.string())
         409 -> throw UsernameTakenException()
         else -> {
-            Timber.error { "Server Error: ${errorBody()?.string()}, ${code()}" }
+            logger.error { "Server Error: ${errorBody()?.string()}, ${code()}" }
             throw ServerErrorException(code())
         }
     }
