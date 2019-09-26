@@ -54,7 +54,7 @@ publishing {
 
 dependencies {
     api(project(":core"))
-    implementation (Libs.kotlin_stdlib_jdk8)
+    implementation(Libs.kotlin_stdlib_jdk8)
     implementation(Libs.kotlinx_coroutines_android)
     implementation(Libs.core_ktx)
     api(Libs.lifecycle_livedata_ktx)
