@@ -13,7 +13,7 @@ buildscript {
         classpath(Libs.android_maven_publish)
         classpath(Libs.dokka_gradle_plugin)
         classpath(Libs.dokka_android_gradle_plugin)
-        classpath("com.dicedmelon.gradle:jacoco-android:0.1.4")
+        classpath(Libs.jacoco_android)
     }
 }
 
@@ -25,7 +25,7 @@ plugins {
 
 subprojects {
     group = "com.ivoberger.jmusicbot-client"
-    version = "0.9.6"
+    version = "0.9.8"
 
     repositories {
         google()
