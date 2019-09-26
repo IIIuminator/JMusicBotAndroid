@@ -50,7 +50,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import java.util.Timer
 import kotlin.concurrent.timer
 
-@Suppress("unused")
+@Suppress("unused", "experimental")
 object JMusicBot {
 
     internal val stateMachine = makeStateMachine()
@@ -365,6 +365,7 @@ object JMusicBot {
             mQueue.send(queue)
         } catch (e: Exception) {
             logger.warn(e) { "Queue update failed" }
+            throw e
         }
     }
 
@@ -376,6 +377,7 @@ object JMusicBot {
             mPlayerState.send(state)
         } catch (e: Exception) {
             logger.warn(e) { "Player currentState update failed" }
+            throw e
         }
     }
 }
