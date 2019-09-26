@@ -57,6 +57,6 @@ dependencies {
     implementation(Libs.kotlin_stdlib_jdk8)
     implementation(Libs.kotlinx_coroutines_android)
     implementation(Libs.core_ktx)
-    implementation(Libs.lifecycle_extensions)
+    api(Libs.lifecycle_livedata_ktx)
     implementation(Libs.splitties_fun_pack_android_base)
 }

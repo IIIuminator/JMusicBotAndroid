@@ -328,8 +328,11 @@ object JMusicBot {
         return@withContext mServiceClient!!.getVersionInfo().process()!!
     }
 
-    fun getQueue(period: Long = 500): ReceiveChannel<List<QueueEntry>> {
-        startQueueUpdates(period)
+    fun getQueue(
+        period: Long = 500,
+        startUpdates: Boolean = true
+    ): ReceiveChannel<List<QueueEntry>> {
+        if (startUpdates) startQueueUpdates(period)
         return mQueue.openSubscription()
     }
 
@@ -342,8 +345,11 @@ object JMusicBot {
         mQueueUpdateTimer = null
     }
 
-    fun getPlayerState(period: Long = 500): ReceiveChannel<PlayerState> {
-        startPlayerUpdates(period)
+    fun getPlayerState(
+        period: Long = 500,
+        startUpdates: Boolean = true
+    ): ReceiveChannel<PlayerState> {
+        if (startUpdates) startPlayerUpdates(period)
         return mPlayerState.openSubscription()
     }
 

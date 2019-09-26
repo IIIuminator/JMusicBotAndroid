@@ -15,16 +15,19 @@
 */
 package com.ivoberger.jmusicbot.client.android
 
+import android.net.wifi.WifiManager.MulticastLock
+import androidx.lifecycle.liveData
 import com.ivoberger.jmusicbot.client.JMusicBot
 import com.ivoberger.jmusicbot.client.utils.DEFAULT_PORT
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import splitties.systemservices.wifiManager
 
 private const val LOCK_TAG = "enq_broadcast"
 
-@ExperimentalCoroutinesApi
+/**
+ * Discover function for Android, calls [JMusicBot.discoverHost] while setting and releasing the required [MulticastLock]
+ */
 suspend fun JMusicBot.discoverHostWithMulticastLock(
     knownHost: String? = null,
     port: Int = DEFAULT_PORT
@@ -36,3 +39,33 @@ suspend fun JMusicBot.discoverHostWithMulticastLock(
         discoverHost(knownHost, port)
         lock.release()
     }
+
+private val stateLiveData by lazy { liveData { for (state in JMusicBot.state) emit(state) } }
+
+private val playerStateLiveData by lazy {
+    liveData { for (playerState in JMusicBot.getPlayerState(startUpdates = false)) emit(playerState) }
+}
+
+private val queueLiveData by lazy {
+    liveData { for (queue in JMusicBot.getQueue(startUpdates = false)) emit(queue) }
+}
+
+/**
+ * [LiveData] delivering client state updates
+ */
+val JMusicBot.stateLiveData
+    get() = com.ivoberger.jmusicbot.client.android.stateLiveData
+
+/**
+ * [LiveData] delivering player state updates
+ * Call [JMusicBot.startPlayerUpdates] to start periodic updates
+ */
+val JMusicBot.playerStateLiveData
+    get() = com.ivoberger.jmusicbot.client.android.playerStateLiveData
+
+/**
+ * [LiveData] delivering queue updates
+ * Call [JMusicBot.startQueueUpdates] to start periodic updates
+ */
+val JMusicBot.queueLiveData
+    get() = com.ivoberger.jmusicbot.client.android.queueLiveData

@@ -13,10 +13,10 @@ object Libs {
   const val core_ktx: String = "androidx.core:core-ktx:" + Versions.core_ktx
 
   /**
-   * https://developer.android.com/topic/libraries/architecture/index.html
+   * http://developer.android.com/tools/extras/support-library.html
    */
-  const val lifecycle_extensions: String = "androidx.lifecycle:lifecycle-extensions:" +
-      Versions.lifecycle_extensions
+  const val lifecycle_livedata_ktx: String = "androidx.lifecycle:lifecycle-livedata-ktx:" +
+      Versions.lifecycle_livedata_ktx
 
   /**
    * https://developer.android.com/studio
