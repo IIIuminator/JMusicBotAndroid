@@ -25,6 +25,7 @@ import com.ivoberger.jmusicbot.client.model.QueueEntry
 import com.ivoberger.jmusicbot.client.testUtils.enterConnectedState
 import com.ivoberger.jmusicbot.client.testUtils.newTestUser
 import com.ivoberger.jmusicbot.client.testUtils.toToken
+import com.mercari.remotedata.RemoteData
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -32,6 +33,7 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -78,9 +80,10 @@ internal class ConnectedTest {
 
         runBlocking {
             val queueUpdates = JMusicBot.getQueue()
-            assertEquals(Queues.full, queueUpdates.receive())
-            assertEquals(Queues.halfFull, queueUpdates.receive())
-            assertEquals(Queues.empty, queueUpdates.receive())
+            assertEquals(RemoteData.Success(Queues.full), queueUpdates.receive())
+            assertTrue(queueUpdates.receive().isFailure)
+            assertEquals(RemoteData.Success(Queues.halfFull), queueUpdates.receive())
+            assertEquals(RemoteData.Success(Queues.empty), queueUpdates.receive())
         }
     }
 
@@ -93,9 +96,13 @@ internal class ConnectedTest {
 
         runBlocking {
             val playerUpdates = JMusicBot.getPlayerState()
-            assertEquals(PlayerStates.playingCaliforniacation, playerUpdates.receive())
-            assertEquals(PlayerStates.stopped, playerUpdates.receive())
-            assertEquals(PlayerStates.paused, playerUpdates.receive())
+            assertEquals(
+                RemoteData.Success(PlayerStates.playingCaliforniacation),
+                playerUpdates.receive()
+            )
+            assertTrue(playerUpdates.receive().isFailure)
+            assertEquals(RemoteData.Success(PlayerStates.stopped), playerUpdates.receive())
+            assertEquals(RemoteData.Success(PlayerStates.paused), playerUpdates.receive())
         }
     }
 }

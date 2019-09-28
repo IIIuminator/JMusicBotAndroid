@@ -35,6 +35,7 @@ dependencies {
     implementation(Libs.kotlin_stdlib_jdk8)
     implementation(Libs.kotlinx_coroutines_core)
 
+    api(Libs.remotedata)
     implementation(Libs.statemachine)
 
     implementation(Libs.dagger)

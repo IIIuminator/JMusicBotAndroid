@@ -40,6 +40,7 @@ import com.ivoberger.jmusicbot.client.model.makeStateMachine
 import com.ivoberger.jmusicbot.client.utils.DEFAULT_PORT
 import com.ivoberger.jmusicbot.client.utils.listenForServerMulticast
 import com.ivoberger.jmusicbot.client.utils.process
+import com.mercari.remotedata.RemoteData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
@@ -74,8 +75,10 @@ object JMusicBot {
 
     val connectionListeners: MutableList<ConnectionChangeListener> = mutableListOf()
 
-    private val mQueue: BroadcastChannel<List<QueueEntry>> = ConflatedBroadcastChannel()
-    private val mPlayerState: BroadcastChannel<PlayerState> = ConflatedBroadcastChannel()
+    private val mQueue: BroadcastChannel<RemoteData<List<QueueEntry>, Exception>> =
+        ConflatedBroadcastChannel()
+    private val mPlayerState: BroadcastChannel<RemoteData<PlayerState, Exception>> =
+        ConflatedBroadcastChannel()
 
     private var mQueueUpdateTimer: Timer? = null
     private var mPlayerUpdateTimer: Timer? = null
@@ -331,7 +334,7 @@ object JMusicBot {
     fun getQueue(
         period: Long = 500,
         startUpdates: Boolean = true
-    ): ReceiveChannel<List<QueueEntry>> {
+    ): ReceiveChannel<RemoteData<List<QueueEntry>, Exception>> {
         if (startUpdates) startQueueUpdates(period)
         return mQueue.openSubscription()
     }
@@ -348,7 +351,7 @@ object JMusicBot {
     fun getPlayerState(
         period: Long = 500,
         startUpdates: Boolean = true
-    ): ReceiveChannel<PlayerState> {
+    ): ReceiveChannel<RemoteData<PlayerState, Exception>> {
         if (startUpdates) startPlayerUpdates(period)
         return mPlayerState.openSubscription()
     }
@@ -368,10 +371,10 @@ object JMusicBot {
         try {
             currentState.connectionCheck()
             val queue = newQueue ?: mServiceClient!!.getQueue().process() ?: listOf()
-            mQueue.send(queue)
+            mQueue.send(RemoteData.Success(queue))
         } catch (e: Exception) {
             logger.warn(e) { "Queue update failed" }
-            throw e
+            mQueue.send(RemoteData.Failure(e))
         }
     }
 
@@ -380,10 +383,10 @@ object JMusicBot {
         try {
             currentState.connectionCheck()
             val state = playerState ?: mServiceClient!!.getPlayerState().process()!!
-            mPlayerState.send(state)
+            mPlayerState.send(RemoteData.Success(state))
         } catch (e: Exception) {
             logger.warn(e) { "Player currentState update failed" }
-            throw e
+            mPlayerState.send(RemoteData.Failure(e))
         }
     }
 }

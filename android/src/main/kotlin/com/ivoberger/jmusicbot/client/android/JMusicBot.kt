@@ -16,8 +16,10 @@
 package com.ivoberger.jmusicbot.client.android
 
 import android.net.wifi.WifiManager.MulticastLock
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import com.ivoberger.jmusicbot.client.JMusicBot
+import com.ivoberger.jmusicbot.client.model.State
 import com.ivoberger.jmusicbot.client.utils.DEFAULT_PORT
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -40,7 +42,9 @@ suspend fun JMusicBot.discoverHostWithMulticastLock(
         lock.release()
     }
 
-private val stateLiveData by lazy { liveData { for (state in JMusicBot.state) emit(state) } }
+private val stateLiveData: LiveData<State> by lazy {
+    liveData { for (state in JMusicBot.state) emit(state) }
+}
 
 private val playerStateLiveData by lazy {
     liveData { for (playerState in JMusicBot.getPlayerState(startUpdates = false)) emit(playerState) }

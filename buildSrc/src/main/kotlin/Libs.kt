@@ -58,6 +58,8 @@ object Libs {
       "com.louiscad.splitties:splitties-fun-pack-android-base:" +
       Versions.splitties_fun_pack_android_base
 
+  const val remotedata: String = "com.mercari.remotedata:remotedata:" + Versions.remotedata
+
   /**
    * https://github.com/square/moshi
    */
