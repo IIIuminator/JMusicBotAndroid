@@ -21,8 +21,7 @@ import com.ivoberger.jmusicbot.client.exceptions.InvalidParametersException
 import com.ivoberger.jmusicbot.client.utils.base64encoded
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import java.util.Date
-import java.util.UUID
+import java.util.*
 
 sealed class Auth {
 
@@ -65,7 +64,7 @@ sealed class Auth {
 data class AuthExpectation(
     val format: AuthType,
     val type: String?,
-    val permissions: List<Permissions>?
+    val permissions: List<Permissions>? = null
 )
 
 enum class AuthType {
