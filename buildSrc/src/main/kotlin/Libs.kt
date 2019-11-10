@@ -7,180 +7,185 @@ import kotlin.String
  *   `$ ./gradlew buildSrcVersions`
  */
 object Libs {
-  /**
-   * http://developer.android.com/tools/extras/support-library.html
-   */
-  const val core_ktx: String = "androidx.core:core-ktx:" + Versions.core_ktx
+    /**
+     * https://github.com/Kotlin/kotlinx.coroutines
+     */
+    const val kotlinx_coroutines_android: String =
+            "org.jetbrains.kotlinx:kotlinx-coroutines-android:" +
+            Versions.org_jetbrains_kotlinx_kotlinx_coroutines
 
-  /**
-   * http://developer.android.com/tools/extras/support-library.html
-   */
-  const val lifecycle_livedata_ktx: String = "androidx.lifecycle:lifecycle-livedata-ktx:" +
-      Versions.lifecycle_livedata_ktx
+    /**
+     * https://github.com/Kotlin/kotlinx.coroutines
+     */
+    const val kotlinx_coroutines_core: String = "org.jetbrains.kotlinx:kotlinx-coroutines-core:" +
+            Versions.org_jetbrains_kotlinx_kotlinx_coroutines
 
-  /**
-   * https://developer.android.com/studio
-   */
-  const val aapt2: String = "com.android.tools.build:aapt2:" + Versions.aapt2
+    /**
+     * https://github.com/Kotlin/kotlinx.coroutines
+     */
+    const val kotlinx_coroutines_test: String = "org.jetbrains.kotlinx:kotlinx-coroutines-test:" +
+            Versions.org_jetbrains_kotlinx_kotlinx_coroutines
 
-  const val com_android_tools_build_gradle: String = "com.android.tools.build:gradle:" +
-      Versions.com_android_tools_build_gradle
+    /**
+     * https://github.com/square/retrofit/
+     */
+    const val converter_moshi: String = "com.squareup.retrofit2:converter-moshi:" +
+            Versions.com_squareup_retrofit2
 
-  /**
-   * https://developer.android.com/studio
-   */
-  const val lint_gradle: String = "com.android.tools.lint:lint-gradle:" + Versions.lint_gradle
+    /**
+     * https://github.com/square/retrofit/
+     */
+    const val retrofit: String = "com.squareup.retrofit2:retrofit:" +
+            Versions.com_squareup_retrofit2
 
-  /**
-   * https://github.com/auth0/java-jwt
-   */
-  const val java_jwt: String = "com.auth0:java-jwt:" + Versions.java_jwt
+    /**
+     * https://github.com/square/okhttp
+     */
+    const val logging_interceptor: String = "com.squareup.okhttp3:logging-interceptor:" +
+            Versions.com_squareup_okhttp3
 
-  const val jacoco_android: String = "com.dicedmelon.gradle:jacoco-android:" +
-      Versions.jacoco_android
+    /**
+     * https://github.com/square/okhttp
+     */
+    const val mockwebserver: String = "com.squareup.okhttp3:mockwebserver:" +
+            Versions.com_squareup_okhttp3
 
-  const val com_diffplug_gradle_spotless_gradle_plugin: String =
-      "com.diffplug.gradle.spotless:com.diffplug.gradle.spotless.gradle.plugin:" +
-      Versions.com_diffplug_gradle_spotless_gradle_plugin
+    /**
+     * https://github.com/square/okhttp
+     */
+    const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.com_squareup_okhttp3
 
-  /**
-   * https://github.com/google/dagger
-   */
-  const val dagger_compiler: String = "com.google.dagger:dagger-compiler:" +
-      Versions.com_google_dagger
+    /**
+     * https://kotlinlang.org/
+     */
+    const val kotlin_android_extensions: String =
+            "org.jetbrains.kotlin:kotlin-android-extensions:" + Versions.org_jetbrains_kotlin
 
-  /**
-   * https://github.com/google/dagger
-   */
-  const val dagger: String = "com.google.dagger:dagger:" + Versions.com_google_dagger
+    /**
+     * https://kotlinlang.org/
+     */
+    const val kotlin_android_extensions_runtime: String =
+            "org.jetbrains.kotlin:kotlin-android-extensions-runtime:" +
+            Versions.org_jetbrains_kotlin
 
-  const val splitties_fun_pack_android_base: String =
-      "com.louiscad.splitties:splitties-fun-pack-android-base:" +
-      Versions.splitties_fun_pack_android_base
+    /**
+     * https://kotlinlang.org/
+     */
+    const val kotlin_annotation_processing_gradle: String =
+            "org.jetbrains.kotlin:kotlin-annotation-processing-gradle:" +
+            Versions.org_jetbrains_kotlin
 
-  const val remotedata: String = "com.mercari.remotedata:remotedata:" + Versions.remotedata
+    const val kotlin_gradle_plugin: String = "org.jetbrains.kotlin:kotlin-gradle-plugin:" +
+            Versions.org_jetbrains_kotlin
 
-  /**
-   * https://github.com/square/moshi
-   */
-  const val moshi_kotlin_codegen: String = "com.squareup.moshi:moshi-kotlin-codegen:" +
-      Versions.com_squareup_moshi
+    /**
+     * https://kotlinlang.org/
+     */
+    const val kotlin_scripting_compiler_embeddable: String =
+            "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:" +
+            Versions.org_jetbrains_kotlin
 
-  /**
-   * https://github.com/square/moshi
-   */
-  const val moshi: String = "com.squareup.moshi:moshi:" + Versions.com_squareup_moshi
+    /**
+     * https://kotlinlang.org/
+     */
+    const val kotlin_stdlib_jdk8: String = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:" +
+            Versions.org_jetbrains_kotlin
 
-  /**
-   * https://github.com/square/okhttp
-   */
-  const val logging_interceptor: String = "com.squareup.okhttp3:logging-interceptor:" +
-      Versions.com_squareup_okhttp3
+    const val dokka_android_gradle_plugin: String =
+            "org.jetbrains.dokka:dokka-android-gradle-plugin:" + Versions.org_jetbrains_dokka
 
-  /**
-   * https://github.com/square/okhttp
-   */
-  const val mockwebserver: String = "com.squareup.okhttp3:mockwebserver:" +
-      Versions.com_squareup_okhttp3
+    const val dokka_gradle_plugin: String = "org.jetbrains.dokka:dokka-gradle-plugin:" +
+            Versions.org_jetbrains_dokka
 
-  /**
-   * https://github.com/square/okhttp
-   */
-  const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.com_squareup_okhttp3
+    /**
+     * https://github.com/square/moshi
+     */
+    const val moshi: String = "com.squareup.moshi:moshi:" + Versions.com_squareup_moshi
 
-  /**
-   * https://github.com/square/retrofit/
-   */
-  const val converter_moshi: String = "com.squareup.retrofit2:converter-moshi:" +
-      Versions.com_squareup_retrofit2
+    /**
+     * https://github.com/square/moshi
+     */
+    const val moshi_kotlin_codegen: String = "com.squareup.moshi:moshi-kotlin-codegen:" +
+            Versions.com_squareup_moshi
 
-  /**
-   * https://github.com/square/retrofit/
-   */
-  const val retrofit: String = "com.squareup.retrofit2:retrofit:" + Versions.com_squareup_retrofit2
+    /**
+     * https://github.com/google/dagger
+     */
+    const val dagger: String = "com.google.dagger:dagger:" + Versions.com_google_dagger
 
-  /**
-   * https://github.com/Tinder/StateMachine
-   */
-  const val statemachine: String = "com.tinder.statemachine:statemachine:" + Versions.statemachine
+    /**
+     * https://github.com/google/dagger
+     */
+    const val dagger_compiler: String = "com.google.dagger:dagger-compiler:" +
+            Versions.com_google_dagger
 
-  const val de_fayard_buildsrcversions_gradle_plugin: String =
-      "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +
-      Versions.de_fayard_buildsrcversions_gradle_plugin
+    const val com_android_tools_build_gradle: String = "com.android.tools.build:gradle:" +
+            Versions.com_android_tools_build_gradle
 
-  const val android_maven_publish: String = "digital.wup:android-maven-publish:" +
-      Versions.android_maven_publish
+    const val com_diffplug_gradle_spotless_gradle_plugin: String =
+            "com.diffplug.gradle.spotless:com.diffplug.gradle.spotless.gradle.plugin:" +
+            Versions.com_diffplug_gradle_spotless_gradle_plugin
 
-  /**
-   * https://github.com/MicroUtils/kotlin-logging
-   */
-  const val kotlin_logging: String = "io.github.microutils:kotlin-logging:" +
-      Versions.kotlin_logging
+    const val de_fayard_buildsrcversions_gradle_plugin: String =
+            "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +
+            Versions.de_fayard_buildsrcversions_gradle_plugin
 
-  const val dokka_android_gradle_plugin: String =
-      "org.jetbrains.dokka:dokka-android-gradle-plugin:" + Versions.org_jetbrains_dokka
+    const val splitties_fun_pack_android_base: String =
+            "com.louiscad.splitties:splitties-fun-pack-android-base:" +
+            Versions.splitties_fun_pack_android_base
 
-  const val dokka_gradle_plugin: String = "org.jetbrains.dokka:dokka-gradle-plugin:" +
-      Versions.org_jetbrains_dokka
+    /**
+     * http://developer.android.com/tools/extras/support-library.html
+     */
+    const val lifecycle_livedata_ktx: String = "androidx.lifecycle:lifecycle-livedata-ktx:" +
+            Versions.lifecycle_livedata_ktx
 
-  /**
-   * https://kotlinlang.org/
-   */
-  const val kotlin_android_extensions_runtime: String =
-      "org.jetbrains.kotlin:kotlin-android-extensions-runtime:" + Versions.org_jetbrains_kotlin
+    const val android_maven_publish: String = "digital.wup:android-maven-publish:" +
+            Versions.android_maven_publish
 
-  /**
-   * https://kotlinlang.org/
-   */
-  const val kotlin_android_extensions: String = "org.jetbrains.kotlin:kotlin-android-extensions:" +
-      Versions.org_jetbrains_kotlin
+    const val jacoco_android: String = "com.dicedmelon.gradle:jacoco-android:" +
+            Versions.jacoco_android
 
-  /**
-   * https://kotlinlang.org/
-   */
-  const val kotlin_annotation_processing_gradle: String =
-      "org.jetbrains.kotlin:kotlin-annotation-processing-gradle:" + Versions.org_jetbrains_kotlin
+    /**
+     * https://github.com/MicroUtils/kotlin-logging
+     */
+    const val kotlin_logging: String = "io.github.microutils:kotlin-logging:" +
+            Versions.kotlin_logging
 
-  const val kotlin_gradle_plugin: String = "org.jetbrains.kotlin:kotlin-gradle-plugin:" +
-      Versions.org_jetbrains_kotlin
+    /**
+     * https://junit.org/junit5/
+     */
+    const val junit_jupiter: String = "org.junit.jupiter:junit-jupiter:" + Versions.junit_jupiter
 
-  /**
-   * https://kotlinlang.org/
-   */
-  const val kotlin_scripting_compiler_embeddable: String =
-      "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:" + Versions.org_jetbrains_kotlin
+    /**
+     * http://www.slf4j.org
+     */
+    const val slf4j_simple: String = "org.slf4j:slf4j-simple:" + Versions.slf4j_simple
 
-  /**
-   * https://kotlinlang.org/
-   */
-  const val kotlin_stdlib_jdk8: String = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:" +
-      Versions.org_jetbrains_kotlin
+    /**
+     * https://github.com/Tinder/StateMachine
+     */
+    const val statemachine: String = "com.tinder.statemachine:statemachine:" + Versions.statemachine
 
-  /**
-   * https://github.com/Kotlin/kotlinx.coroutines
-   */
-  const val kotlinx_coroutines_android: String =
-      "org.jetbrains.kotlinx:kotlinx-coroutines-android:" + Versions.org_jetbrains_kotlinx
+    /**
+     * https://developer.android.com/studio
+     */
+    const val lint_gradle: String = "com.android.tools.lint:lint-gradle:" + Versions.lint_gradle
 
-  /**
-   * https://github.com/Kotlin/kotlinx.coroutines
-   */
-  const val kotlinx_coroutines_core: String = "org.jetbrains.kotlinx:kotlinx-coroutines-core:" +
-      Versions.org_jetbrains_kotlinx
+    const val remotedata: String = "com.mercari.remotedata:remotedata:" + Versions.remotedata
 
-  /**
-   * https://github.com/Kotlin/kotlinx.coroutines
-   */
-  const val kotlinx_coroutines_test: String = "org.jetbrains.kotlinx:kotlinx-coroutines-test:" +
-      Versions.org_jetbrains_kotlinx
+    /**
+     * http://developer.android.com/tools/extras/support-library.html
+     */
+    const val core_ktx: String = "androidx.core:core-ktx:" + Versions.core_ktx
 
-  /**
-   * https://junit.org/junit5/
-   */
-  const val junit_jupiter: String = "org.junit.jupiter:junit-jupiter:" + Versions.junit_jupiter
+    /**
+     * https://github.com/auth0/java-jwt
+     */
+    const val java_jwt: String = "com.auth0:java-jwt:" + Versions.java_jwt
 
-  /**
-   * http://www.slf4j.org
-   */
-  const val slf4j_simple: String = "org.slf4j:slf4j-simple:" + Versions.slf4j_simple
+    /**
+     * https://developer.android.com/studio
+     */
+    const val aapt2: String = "com.android.tools.build:aapt2:" + Versions.aapt2
 }

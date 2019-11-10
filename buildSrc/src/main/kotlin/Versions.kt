@@ -12,60 +12,58 @@ import org.gradle.plugin.use.PluginDependencySpec
  * YOU are responsible for updating manually the dependency version.
  */
 object Versions {
-  const val core_ktx: String = "1.1.0"
+    const val org_jetbrains_kotlinx_kotlinx_coroutines: String = "1.3.2"
 
-  const val lifecycle_livedata_ktx: String = "2.2.0-alpha05"
+    const val com_squareup_retrofit2: String = "2.6.2"
 
-  const val aapt2: String = "3.5.0-5435860"
+    const val com_squareup_okhttp3: String = "4.2.2"
 
-  const val com_android_tools_build_gradle: String = "3.5.0"
+    const val org_jetbrains_kotlin: String = "1.3.50"
 
-  const val lint_gradle: String = "26.5.0"
+    const val org_jetbrains_dokka: String = "0.9.18"
 
-  const val java_jwt: String = "3.8.3"
+    const val com_squareup_moshi: String = "1.9.1"
 
-  const val jacoco_android: String = "0.1.4"
+    const val com_google_dagger: String = "2.25.2"
 
-  const val com_diffplug_gradle_spotless_gradle_plugin: String = "3.24.3"
+    const val com_android_tools_build_gradle: String = "3.5.2"
 
-  const val com_google_dagger: String = "2.24"
+    const val com_diffplug_gradle_spotless_gradle_plugin: String = "3.25.0"
 
-  const val splitties_fun_pack_android_base: String = "3.0.0-alpha06"
+    const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
-  const val remotedata: String = "1.0.0"
+    const val splitties_fun_pack_android_base: String = "3.0.0-alpha06"
 
-  const val com_squareup_moshi: String = "1.8.0"
+    const val lifecycle_livedata_ktx: String = "2.2.0-rc02"
 
-  const val com_squareup_okhttp3: String = "4.2.0"
+    const val android_maven_publish: String = "3.6.3"
 
-  const val com_squareup_retrofit2: String = "2.6.2"
+    const val jacoco_android: String = "0.1.4"
 
-  const val statemachine: String = "0.2.0"
+    const val kotlin_logging: String = "1.7.6"
 
-  const val de_fayard_buildsrcversions_gradle_plugin: String = "0.5.0" // available: "0.6.1"
+    const val junit_jupiter: String = "5.5.2"
 
-  const val android_maven_publish: String = "3.6.2"
+    const val slf4j_simple: String = "1.7.29"
 
-  const val kotlin_logging: String = "1.7.6"
+    const val statemachine: String = "0.2.0"
 
-  const val org_jetbrains_dokka: String = "0.9.18"
+    const val lint_gradle: String = "26.5.2"
 
-  const val org_jetbrains_kotlin: String = "1.3.50"
+    const val remotedata: String = "1.0.0"
 
-  const val org_jetbrains_kotlinx: String = "1.3.2"
+    const val core_ktx: String = "1.1.0"
 
-  const val junit_jupiter: String = "5.5.2"
+    const val java_jwt: String = "3.8.3"
 
-  const val slf4j_simple: String = "1.7.28"
+    const val aapt2: String = "3.5.2-5435860"
 
-  /**
-   *
-   * See issue 19: How to update Gradle itself?
-   * https://github.com/jmfayard/buildSrcVersions/issues/19
-   */
-  const val gradleLatestVersion: String = "5.6.2"
-
-  const val gradleCurrentVersion: String = "5.6.2"
+    /**
+     * Current version: "5.6.2"
+     * See issue 19: How to update Gradle itself?
+     * https://github.com/jmfayard/buildSrcVersions/issues/19
+     */
+    const val gradleLatestVersion: String = "6.0"
 }
 
 /**
@@ -73,5 +71,5 @@ object Versions {
  * https://github.com/jmfayard/buildSrcVersions/issues/47
  */
 val PluginDependenciesSpec.buildSrcVersions: PluginDependencySpec
-  inline get() =
-      id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)
+    inline get() =
+            id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)
